@@ -35,7 +35,7 @@ src/xfsbl_partition_load.o src/xfsbl_partition_load.o: \
  ../../fsbl_bsp/psu_cortexa53_0/include/xsecure_aes.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xcsudma.h ../src/xfsbl_bs.h \
  ../src/xfsbl_csu_dma.h \
- C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h \
+ C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h \
  ../src/xfsbl_plpartition_valid.h
 
 ../../fsbl_bsp/psu_cortexa53_0/include/xil_cache.h:
@@ -122,6 +122,6 @@ src/xfsbl_partition_load.o src/xfsbl_partition_load.o: \
 
 ../src/xfsbl_csu_dma.h:
 
-C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h:
+C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h:
 
 ../src/xfsbl_plpartition_valid.h:
