@@ -14,7 +14,7 @@
 /*************************************************************************************/
 
 /**
- * Definitions
+ * Definitions for UART interface
  */
 
 #define UART0_DEVICE_ID              XPAR_XUARTPS_0_DEVICE_ID
