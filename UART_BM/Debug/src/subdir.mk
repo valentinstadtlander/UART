@@ -7,13 +7,25 @@ LD_SRCS += \
 ../src/lscript.ld 
 
 C_SRCS += \
-../src/Hello_world.c 
+../src/CRC.c \
+../src/Hello_world.c \
+../src/UART_EIVE_Protocol_Recv.c \
+../src/UART_EIVE_Protocol_Send.c \
+../src/UART_io.c 
 
 OBJS += \
-./src/Hello_world.o 
+./src/CRC.o \
+./src/Hello_world.o \
+./src/UART_EIVE_Protocol_Recv.o \
+./src/UART_EIVE_Protocol_Send.o \
+./src/UART_io.o 
 
 C_DEPS += \
-./src/Hello_world.d 
+./src/CRC.d \
+./src/Hello_world.d \
+./src/UART_EIVE_Protocol_Recv.d \
+./src/UART_EIVE_Protocol_Send.d \
+./src/UART_io.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

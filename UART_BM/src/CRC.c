@@ -2,20 +2,22 @@
  * CRC.c
  *
  *  Created on: 26.03.2020
- *      Author: tobi, valentin
+ *      Author: Tobias & Valentin
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "CRC.h"
+#include "UART_io.h"
+#include "xparameters.h"
 
 /*
- * CRC calculation function for a message more than one byte
+ * CRC calculation function for one byte
  *
- * bytes[]: message with bytes for crc calculation
- * length:  length of the byte array
+ * start_crc: start value for crc calculation
+ * byte: 	  byte for crc calculation
  *
- * returns the calculated 8-bit crc value for the whole message
+ * returns the calculated 8-bit crc value for the given byte
  */
 uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte)
 {
@@ -34,14 +36,13 @@ uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte)
 	return crc;
 }
 
-
 /*
- * CRC calculation function for one byte
+ * CRC calculation function for a message more than one byte
  *
- * start_crc: start value for crc calculation
- * byte: 	  byte for crc calculation
+ * bytes[]: message with bytes for crc calculation
+ * length:  length of the byte array
  *
- * returns the calculated 8-bit crc value for the given byte
+ * returns the calculated 8-bit crc value for the whole message
  */
 uint8_t calc_crc8(uint8_t bytes[], int length)
 {
@@ -52,4 +53,16 @@ uint8_t calc_crc8(uint8_t bytes[], int length)
 	}
 
 	return crc_val;
+}
+
+int check_crc(uint8_t crc_val, uint8_t *data)
+{
+	uint8_t calculated_crc;
+
+	calculated_crc = calc_crc8(data, BUFFER_SIZE - 1);
+
+	if(calculated_crc != crc_val)
+		return XST_FAILURE;
+
+	return XST_SUCCESS;
 }

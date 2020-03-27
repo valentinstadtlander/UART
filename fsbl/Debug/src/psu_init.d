@@ -1,5 +1,5 @@
 src/psu_init.o src/psu_init.o: \
- C:/Users/Tobi/Documents/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.c \
+ C:/Test_Board/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.c \
  ../../fsbl_bsp/psu_cortexa53_0/include/xil_io.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xil_types.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xil_printf.h \
@@ -11,7 +11,7 @@ src/psu_init.o src/psu_init.o: \
  ../../fsbl_bsp/psu_cortexa53_0/include/xpseudo_asm_gcc.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/sleep.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xil_io.h \
- C:/Users/Tobi/Documents/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.h
+ C:/Test_Board/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.h
 
 ../../fsbl_bsp/psu_cortexa53_0/include/xil_io.h:
 
@@ -35,4 +35,4 @@ src/psu_init.o src/psu_init.o: \
 
 ../../fsbl_bsp/psu_cortexa53_0/include/xil_io.h:
 
-C:/Users/Tobi/Documents/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.h:
+C:/Test_Board/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.h:

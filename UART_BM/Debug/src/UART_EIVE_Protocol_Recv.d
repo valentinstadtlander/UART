@@ -1,4 +1,5 @@
-src/Hello_world.o src/Hello_world.o: ../src/Hello_world.c \
+src/UART_EIVE_Protocol_Recv.o src/UART_EIVE_Protocol_Recv.o: \
+ ../src/UART_EIVE_Protocol_Recv.c ../src/UART_EIVE_Protocol.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xparameters.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xparameters_ps.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xuartps.h \
@@ -13,8 +14,10 @@ src/Hello_world.o src/Hello_world.o: ../src/Hello_world.c \
  ../../fsbl_bsp/psu_cortexa53_0/include/xpseudo_asm.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xreg_cortexa53.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xpseudo_asm_gcc.h \
- ../../fsbl_bsp/psu_cortexa53_0/include/xplatform_info.h \
- ../../fsbl_bsp/psu_cortexa53_0/include/xil_printf.h ../src/UART_io.h
+ ../../fsbl_bsp/psu_cortexa53_0/include/xplatform_info.h ../src/UART_io.h \
+ ../../fsbl_bsp/psu_cortexa53_0/include/xil_printf.h ../src/CRC.h
+
+../src/UART_EIVE_Protocol.h:
 
 ../../fsbl_bsp/psu_cortexa53_0/include/xparameters.h:
 
@@ -46,6 +49,8 @@ src/Hello_world.o src/Hello_world.o: ../src/Hello_world.c \
 
 ../../fsbl_bsp/psu_cortexa53_0/include/xplatform_info.h:
 
+../src/UART_io.h:
+
 ../../fsbl_bsp/psu_cortexa53_0/include/xil_printf.h:
 
-../src/UART_io.h:
+../src/CRC.h:

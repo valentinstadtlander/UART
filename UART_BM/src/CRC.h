@@ -2,7 +2,7 @@
  * CRC.h
  *
  *  Created on: 26.03.2020
- *      Author: tobi, valentin
+ *      Author: Tobias & Valentin
  */
 
 #ifndef CRC_H_
@@ -34,5 +34,9 @@ uint8_t calc_crc8(uint8_t bytes[], int length);
  * returns the calculated 8-bit crc value for the given byte
  */
 uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte);
+
+
+
+int check_crc(uint8_t crc_val, uint8_t *data);
 
 #endif /* CRC_H_ */
