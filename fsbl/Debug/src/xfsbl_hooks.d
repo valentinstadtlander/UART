@@ -15,7 +15,7 @@ src/xfsbl_hooks.o src/xfsbl_hooks.o: ../src/xfsbl_hooks.c \
  ../src/xfsbl_debug.h ../../fsbl_bsp/psu_cortexa53_0/include/xil_printf.h \
  ../src/xfsbl_error.h ../src/xfsbl_hooks.h ../src/xfsbl_misc.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xil_exception.h \
- C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h
+ C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h
 
 ../src/xfsbl_hw.h:
 
@@ -59,4 +59,4 @@ src/xfsbl_hooks.o src/xfsbl_hooks.o: ../src/xfsbl_hooks.c \
 
 ../../fsbl_bsp/psu_cortexa53_0/include/xil_exception.h:
 
-C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h:
+C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h:

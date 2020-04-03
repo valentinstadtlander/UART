@@ -16,7 +16,7 @@ src/xfsbl_handoff.o src/xfsbl_handoff.o: ../src/xfsbl_handoff.c \
  ../src/xfsbl_error.h ../src/xfsbl_hooks.h ../src/xfsbl_misc.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xil_exception.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xil_cache.h \
- C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h \
+ C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h \
  ../src/xfsbl_main.h ../src/xfsbl_image_header.h \
  ../src/xfsbl_misc_drivers.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xplatform_info.h \
@@ -71,7 +71,7 @@ src/xfsbl_handoff.o src/xfsbl_handoff.o: ../src/xfsbl_handoff.c \
 
 ../../fsbl_bsp/psu_cortexa53_0/include/xil_cache.h:
 
-C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h:
+C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0/psu_init.h:
 
 ../src/xfsbl_main.h:
 
