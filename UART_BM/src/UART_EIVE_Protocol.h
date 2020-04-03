@@ -35,8 +35,12 @@
 
 /**Functions to send**/
 int UART_Send_Data(u8 ID, u8 *databytes[], int dataLength);
+void request_to_send(uint8_t ID, uint8_t *temp, int packageCount);
 int package_count(int dataLength);
-void fill_header(u8 *header, u8 ID, u8 *databytes, int dataLength, int *packageCount);
+void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *temp, int packageCount, uint8_t *flags);
+void fill_header(uint8_t *header, uint8_t ID, uint8_t *databytes, int dataLength, int *packageCount, uint8_t *flags);
+uint8_t set_Flags(uint8_t *flags);
+void set_ACK_Flag(uint8_t *flags, uint8_t val);
 
 /**Functions to receive**/
 int UART_Recv_Data();
