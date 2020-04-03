@@ -7,7 +7,7 @@ LD_SRCS += \
 ../src/lscript.ld 
 
 C_SRCS += \
-C:/Test_Board/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.c \
+C:/Users/Tobi/Documents/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.c \
 ../src/xfsbl_authentication.c \
 ../src/xfsbl_board.c \
 ../src/xfsbl_bs.c \
@@ -87,24 +87,24 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/psu_init.o: C:/Test_Board/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.c
+src/psu_init.o: C:/Users/Tobi/Documents/test_board/workspace/sdk/zusys_wrapper_hw_platform_0/psu_init.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: ARM v8 gcc compiler'
-	aarch64-none-elf-gcc -DARMA53_64 -DFSBL_DEBUG_INFO -Wall -O0 -g3 -I"C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0" -c -fmessage-length=0 -MT"$@" -Os -flto -ffat-lto-objects -I../../fsbl_bsp/psu_cortexa53_0/include -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	aarch64-none-elf-gcc -DARMA53_64 -DFSBL_DEBUG_INFO -Wall -O0 -g3 -I"C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0" -c -fmessage-length=0 -MT"$@" -Os -flto -ffat-lto-objects -I../../fsbl_bsp/psu_cortexa53_0/include -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
 src/%.o: ../src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: ARM v8 gcc compiler'
-	aarch64-none-elf-gcc -DARMA53_64 -DFSBL_DEBUG_INFO -Wall -O0 -g3 -I"C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0" -c -fmessage-length=0 -MT"$@" -Os -flto -ffat-lto-objects -I../../fsbl_bsp/psu_cortexa53_0/include -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	aarch64-none-elf-gcc -DARMA53_64 -DFSBL_DEBUG_INFO -Wall -O0 -g3 -I"C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0" -c -fmessage-length=0 -MT"$@" -Os -flto -ffat-lto-objects -I../../fsbl_bsp/psu_cortexa53_0/include -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
 src/%.o: ../src/%.S
 	@echo 'Building file: $<'
 	@echo 'Invoking: ARM v8 gcc compiler'
-	aarch64-none-elf-gcc -DARMA53_64 -DFSBL_DEBUG_INFO -Wall -O0 -g3 -I"C:\Test_Board\test_board\workspace\sdk\zusys_wrapper_hw_platform_0" -c -fmessage-length=0 -MT"$@" -Os -flto -ffat-lto-objects -I../../fsbl_bsp/psu_cortexa53_0/include -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	aarch64-none-elf-gcc -DARMA53_64 -DFSBL_DEBUG_INFO -Wall -O0 -g3 -I"C:\Users\Tobi\Documents\test_board\workspace\sdk\zusys_wrapper_hw_platform_0" -c -fmessage-length=0 -MT"$@" -Os -flto -ffat-lto-objects -I../../fsbl_bsp/psu_cortexa53_0/include -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

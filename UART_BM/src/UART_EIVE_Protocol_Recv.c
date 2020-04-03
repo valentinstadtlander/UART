@@ -10,20 +10,31 @@
 #include "UART_io.h"
 #include "CRC.h"
 
-/** Identification numbers for commands **/
-#define CAMERA_SS	0b00000000
-#define UART_SS		0b00001010
-#define BRAM_SS		0b00000101
-#define CPU_SS		0b00001111
-#define DOWNLINK_SS	0b00001001
-#define DAC_SS		0b00000110
-#define DATA_SS		0b11110000
+/** Identification numbers for TM/TC **/
+#define CAMERA_TC	0b00000000
+#define CAMERA_TM	0b11110000
 
+#define UART_TC		0b00001010
+#define UART_TM		0b11111010
+
+#define BRAM_TC		0b00000101
+#define BRAM_TM		0b11110101
+
+#define CPU_TC		0b00001111
+#define CPU_TM		0b11111111
+
+#define DOWNLINK_TC	0b00001001
+#define DOWNLINK_TM	0b11111001
+
+#define DAC_TC		0b00000110
+#define DAC_TM		0b11110110
+
+//Long buffer for receiving data
 uint8_t databuffer[357143];
 
-
-int recv_cmd(uint8_t *id, u8 *databytes);
-int recv_data(uint8_t *header);
+//Functions for receiving
+int recv_cmd(uint8_t *id, u8 *databytes); //Anpassen zu recv_tc
+int recv_data(uint8_t *header); //Überarbeiten -> Neue Flowchart
 
 /**
  *
@@ -37,15 +48,15 @@ int UART_Recv_Data()
 	extract_header(RecvBuffer, header, data);
 	u8 temp[31] = {header[ID_POS], header[DATA_SIZE_POS], header[FLAGS_POS], data}; //check
 
-	if(check_crc(header[CRC_POS], temp) != XST_SUCCESS)
+	if(check_crc(header[CRC_POS], temp, INIT_CRC) != XST_SUCCESS)
 	{
-		set_ACK_Flag(header[FLAGS_POS], 0);
+		set_ACK_Flag(&header[FLAGS_POS], 0);
 		UART_ACK();
 		return XST_FAILURE;
 	}
 	else
 	{
-		set_ACK_Flag(header[FLAGS_POS], 1);
+		set_ACK_Flag(&header[FLAGS_POS], 1);
 	}
 
 	if(check_TC_flag(&header[FLAGS_POS]) == 1)
@@ -145,13 +156,12 @@ int recv_cmd(uint8_t *header, u8 *databytes)
 
 	switch(id)
 	{
-		case CAMERA_SS: break;
-		case UART_SS: break;
-		case CPU_SS: break;
-		case BRAM_SS: break;
-		case DOWNLINK_SS: break;
-		case DAC_SS: break;
-		case DATA_SS: break;
+		case CAMERA_TC: break;
+		case UART_TC: break;
+		case CPU_TC: break;
+		case BRAM_TC: break;
+		case DOWNLINK_TC: break;
+		case DAC_TC: break;
 		default: return XST_FAILURE;
 	}
 
@@ -177,6 +187,7 @@ int recv_data(uint8_t *header)
 
 		uint8_t new_header[4];
 		uint8_t new_data[PACKAGE_DATA_SIZE];
+		uint8_t last_crc = header[CRC_POS];
 
 		int datacounter = 0;
 		uint8_t end = 0;
@@ -194,17 +205,18 @@ int recv_data(uint8_t *header)
 			u8 temp[31] = {new_header[ID_POS], new_header[DATA_SIZE_POS], new_header[FLAGS_POS], new_data}; //check
 
 			//CRC check
-			if(check_crc(new_header[CRC_POS], temp) != XST_SUCCESS)
+			if(check_crc(new_header[CRC_POS], temp, last_crc) != XST_SUCCESS)
 			{
-				set_ACK_Flag(new_header[FLAGS_POS], 0);
+				set_ACK_Flag(&new_header[FLAGS_POS], 0);
 				UART_ACK();
 				continue;
 			}
-			else
-			{
-				set_ACK_Flag(new_header[FLAGS_POS], 1);
-			}
 
+			//
+			set_ACK_Flag(&new_header[FLAGS_POS], 1);
+
+			//
+			last_crc = new_header[CRC_POS];
 
 			//check if this package was the last data package
 			if(check_end_flag(&new_header[FLAGS_POS]) == 1)
@@ -217,11 +229,6 @@ int recv_data(uint8_t *header)
 
 			datacounter += new_header[DATA_SIZE_POS];
 		}
-
-		set_end_conn_flag(&flags, 1);
-
-		// -> send end connection
-
 	}
 	else
 	{

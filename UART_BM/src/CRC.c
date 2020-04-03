@@ -41,13 +41,14 @@ uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte)
  *
  * bytes[]: message with bytes for crc calculation
  * length:  length of the byte array
+ * crc_initval: the start value for calculating crc of the data
  *
  * returns the calculated 8-bit crc value for the whole message
  */
-uint8_t calc_crc8(uint8_t bytes[], int length)
+uint8_t calc_crc8(uint8_t bytes[], int length, uint8_t crc_initval)
 {
-	uint8_t crc_val = 0x00;
-	for(int i = 0; i <length; i++)
+	uint8_t crc_val = crc_initval;
+	for(int i = 0; i < length; i++)
 	{
 		crc_val = calc_crc8_for_one_byte(crc_val, bytes[i]);
 	}
@@ -55,11 +56,11 @@ uint8_t calc_crc8(uint8_t bytes[], int length)
 	return crc_val;
 }
 
-int check_crc(uint8_t crc_val, uint8_t *data)
+int check_crc(uint8_t crc_val, uint8_t *data, uint8_t crc_initval)
 {
 	uint8_t calculated_crc;
 
-	calculated_crc = calc_crc8(data, BUFFER_SIZE - 1);
+	calculated_crc = calc_crc8(data, BUFFER_SIZE - 1, crc_initval);
 
 	if(calculated_crc != crc_val)
 		return XST_FAILURE;
