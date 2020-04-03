@@ -13,6 +13,22 @@
 #include "UART_io.h"
 #include "xparameters.h"
 
+/**Masks for Flags**/
+#define ACK_MASK            	0b10000000
+#define REQ_TO_SEND_MASK    	0b01000000
+#define READY_TO_RECV_MASK  	0b00100000
+#define START_MASK          	0b00010000
+#define END_MASK            	0b00001000
+#define PCKG_LENGTH_MASK       	0b00000100
+
+/**Flags number decimal**/
+#define ACK_DEC            		128
+#define REQ_TO_SEND_DEC    		64
+#define READY_TO_RECV_DEC  		32
+#define START_DEC          		16
+#define END_DEC            		8
+#define PCKG_LENGTH_DEC    		4
+
 
 int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength) {
 
@@ -26,10 +42,13 @@ int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength) {
 	//check ready to receive
 	if(ready_to_receive() == XST_SUCCESS)
 	{
-		uint8_t flags =
+		//uint8_t flags =
 		//fill_packages(ID, dataLength, *databytes, *temp, packageCount, flags);
-	}
 
+		//check packetsize
+		//
+
+	}
 
 	return status;
 }
@@ -52,7 +71,7 @@ int ready_to_receive()
 
 	uint8_t flag_rdy_2_rcv = header[2] | READY_TO_RECV_MASK;
 
-	if(flag_rdy_2_rcv != 16)
+	if(flag_rdy_2_rcv != 16) //anpassen!
 		return XST_FAILURE;
 	else return XST_SUCCESS;
 
@@ -132,12 +151,11 @@ void fill_header(uint8_t *header, uint8_t ID, uint8_t *databytes, int dataLength
 
 uint8_t set_Flags(uint8_t *flags)
 {
-	set_ACK_Flag(flags, flags[1]);
-	set_TC_Flag(flags, flags[2]);
-	set_Req_to_send_Flag(flags, flags[3]);
-	set_Start_Flag(flags, flags[5]);
-	set_End_Flag(flags, flags[6]);
-	set_End_Conn_Flag(flags, flags[7]);
+	set_ACK_Flag(flags, flags[7]);
+	set_Req_to_send_Flag(flags, flags[6]);
+	set_Start_Flag(flags, flags[4]);
+	set_End_Flag(flags, flags[3]);
+	set_Pckg_Length_Flag(flags, flags[1]);
 }
 
 int UART_ACK()
@@ -145,7 +163,12 @@ int UART_ACK()
 
 }
 
-//set Flags Methods
+/*
+ * Setter Methods for ACK-Flag
+ *
+ * @*flags 	flags array
+ * @ack 	ACK or NACK
+ */
 void set_ACK_Flag(uint8_t *flags, uint8_t ack)
 {
 	if(ack == 1)
@@ -154,14 +177,12 @@ void set_ACK_Flag(uint8_t *flags, uint8_t ack)
 		*flags &= ~ACK_MASK;
 }
 
-void set_TC_Flag(uint8_t *flags, uint8_t TC)
-{
-	if(TC == 1)
-		*flags |= TC_MASK;
-	else
-		*flags &= ~TC_MASK;
-}
-
+/*
+ * Setter Methods for Req_to_send-Flag
+ *
+ * @*flags 			flags array
+ * @req_to_send 	bit req_to_send
+ */
 void set_Req_to_send_Flag(uint8_t *flags, uint8_t req_to_send)
 {
 	if(req_to_send == 1)
@@ -170,6 +191,12 @@ void set_Req_to_send_Flag(uint8_t *flags, uint8_t req_to_send)
 		*flags &= ~REQ_TO_SEND_MASK;
 }
 
+/*
+ * Setter Methods for Start-Flag
+ *
+ * @*flags 	flags array
+ * @start 	first package
+ */
 void set_Start_Flag(uint8_t *flags, uint8_t start)
 {
 	if(start == 1)
@@ -178,6 +205,12 @@ void set_Start_Flag(uint8_t *flags, uint8_t start)
 		*flags &= ~START_MASK;
 }
 
+/*
+ * Setter Methods for End-Flag
+ *
+ * @*flags 	flags array
+ * @end 	last package
+ */
 void set_End_Flag(uint8_t *flags, uint8_t end)
 {
 	if(end == 1)
@@ -186,10 +219,16 @@ void set_End_Flag(uint8_t *flags, uint8_t end)
 		*flags &= ~END_MASK;
 }
 
-void set_End_Conn_Flag(uint8_t *flags, uint8_t end_conn)
+/*
+ * Setter Methods for pckg_length-Flag
+ *
+ * @*flags 		flags array
+ * @pck_length 	package length
+ */
+void set_Pckg_Length_Flag(uint8_t *flags, uint8_t pckg_length)
 {
-	if(end_conn == 1)
-		*flags |= END_CONN_MASK;
+	if(pckg_length == 1)
+		*flags |= PCKG_LENGTH_MASK;
 	else
-		*flags &= ~END_CONN_MASK;
+		*flags &= ~PCKG_LENGTH_MASK;
 }

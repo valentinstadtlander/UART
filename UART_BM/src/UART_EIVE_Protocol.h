@@ -24,14 +24,6 @@
 #define FLAGS_POS 		3
 
 
-/**Masks for Flags**/
-#define ACK_MASK            0b00000010
-#define TC_MASK             0b00000100
-#define REQ_TO_SEND_MASK    0b00001000
-#define READY_TO_RECV_MASK  0b00010000
-#define START_MASK          0b00100000
-#define END_MASK            0b01000000
-#define END_CONN_MASK       0b10000000
 
 /**Functions to send**/
 int UART_Send_Data(u8 ID, u8 *databytes[], int dataLength);
