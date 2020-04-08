@@ -58,6 +58,23 @@
 #define DATA_SIZE_POS 	2
 #define FLAGS_POS 		3
 
+<<<<<<< Updated upstream
+=======
+/**Masks for Flags**/
+#define ACK_MASK            	0b10000000
+#define REQ_TO_SEND_MASK    	0b01000000
+#define READY_TO_RECV_MASK  	0b00100000
+#define START_MASK          	0b00010000
+#define END_MASK            	0b00001000
+
+/**Flags number decimal**/
+#define ACK_DEC            		128
+#define REQ_TO_SEND_DEC    		64
+#define READY_TO_RECV_DEC  		32
+#define START_DEC          		16
+#define END_DEC            		8
+
+>>>>>>> Stashed changes
 /**Functions to send**/
 int UART_Send_Data(u8 ID, u8 *databytes[], int dataLength);
 void request_to_send(uint8_t ID, uint8_t *temp, int packageCount);
