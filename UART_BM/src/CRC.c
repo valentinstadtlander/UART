@@ -10,6 +10,7 @@
 #include "CRC.h"
 #include "UART_io.h"
 #include "xparameters.h"
+#include "UART_EIVE_Protocol.h"
 
 /*
  * CRC calculation function for one byte
@@ -56,11 +57,18 @@ uint8_t calc_crc8(uint8_t bytes[], int length, uint8_t crc_initval)
 	return crc_val;
 }
 
-int check_crc(uint8_t crc_val, uint8_t *data, uint8_t crc_initval)
+/*
+ *
+ */
+int check_crc(uint8_t crc_val, uint8_t *header, uint8_t *data, uint8_t crc_initval)
 {
 	uint8_t calculated_crc;
 
-	calculated_crc = calc_crc8(data, BUFFER_SIZE - 1, crc_initval);
+	//temp array for crc check
+	uint8_t temp[31] = {header[ID_POS], header[DATA_SIZE_POS], header[FLAGS_POS], *data}; //check
+
+
+	calculated_crc = calc_crc8(temp, BUFFER_SIZE - 1, crc_initval);
 
 	if(calculated_crc != crc_val)
 		return XST_FAILURE;

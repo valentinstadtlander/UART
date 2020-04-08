@@ -58,8 +58,6 @@
 #define DATA_SIZE_POS 	2
 #define FLAGS_POS 		3
 
-<<<<<<< Updated upstream
-=======
 /**Masks for Flags**/
 #define ACK_MASK            	0b10000000
 #define REQ_TO_SEND_MASK    	0b01000000
@@ -74,7 +72,9 @@
 #define START_DEC          		16
 #define END_DEC            		8
 
->>>>>>> Stashed changes
+//Long buffer for receiving data
+uint8_t databuffer[357143];
+
 /**Functions to send**/
 int UART_Send_Data(u8 ID, u8 *databytes[], int dataLength);
 void request_to_send(uint8_t ID, uint8_t *temp, int packageCount);
@@ -86,14 +86,20 @@ void set_ACK_Flag(uint8_t *flags, uint8_t val);
 
 /**Functions to receive**/
 int UART_Recv_Data();
+int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t *old_id, uint8_t *flags);
 int extract_header(uint8_t *rcvBuffer, uint8_t *header, uint8_t *data);
 int check_ACK_flag(uint8_t *flags);
-int check_TC_flag(uint8_t *flags);
 int check_Req_to_send_flag(uint8_t *flags);
 int check_ready_to_recv_flag(uint8_t *flags);
 int check_start_flag(uint8_t *flags);
 int check_end_flag(uint8_t *flags);
-int check_end_conn_flag(uint8_t *flags);
+int send_failure(uint8_t *last_crc, uint8_t *old_id);
+int send_success(uint8_t *last_crc, uint8_t *old_id, uint8_t *flags);
+int UART_answer();
+int recv_TC(uint8_t *header, u8 *databytes);
+int recv_TM();
+void default_operation();
+
 
 
 #endif /* SRC_UART_EIVE_PROTOCOL_H_ */

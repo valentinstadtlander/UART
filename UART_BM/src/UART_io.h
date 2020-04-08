@@ -29,6 +29,8 @@
 #define BUFFER_SIZE  32
 #define END_OF_TRANSMISSION '\n'
 
+#define NO_DATA_AVAILABLE 2L
+
 static XUartPs Uart_Ps;
 
 static u8 SendBuffer[BUFFER_SIZE];

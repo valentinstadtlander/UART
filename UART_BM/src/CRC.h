@@ -45,7 +45,9 @@ uint8_t calc_crc8(uint8_t bytes[], int length,  uint8_t crc_initval);
 uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte);
 
 
-
-int check_crc(uint8_t crc_val, uint8_t *data, uint8_t crc_initval);
+/*
+ *
+ */
+int check_crc(uint8_t crc_val, uint8_t *header, uint8_t *data, uint8_t crc_initval);
 
 #endif /* CRC_H_ */

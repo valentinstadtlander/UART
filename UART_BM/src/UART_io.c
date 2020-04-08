@@ -86,7 +86,12 @@ int UART_Recv_Buffer() {
 	}
 
 	/* Wait until there is data */
-	while (!XUartPs_IsReceiveData(Uart_Ps.Config.BaseAddress));
+	/*while (!XUartPs_IsReceiveData(Uart_Ps.Config.BaseAddress));*/
+
+	/* Break if no data  */
+	 if(!XUartPs_IsReceiveData(Uart_Ps.Config.BaseAddress))
+		 return NO_DATA_AVAILABLE;
+
 
 	/* Block receiving the buffer. */
 	u32 ReceivedCount = 0;
