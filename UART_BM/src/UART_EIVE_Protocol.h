@@ -72,20 +72,21 @@
 #define START_DEC          		16
 #define END_DEC            		8
 
-<<<<<<< Updated upstream
 //Long buffer for receiving data
 uint8_t databuffer[357143];
 
-=======
->>>>>>> Stashed changes
 /**Functions to send**/
-int UART_Send_Data(u8 ID, u8 *databytes[], int dataLength);
-void request_to_send(uint8_t ID, uint8_t *temp, int packageCount);
+int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength);
+void request_to_send(uint8_t ID, uint8_t *temp, uint8_t *lastCRC);
 int package_count(int dataLength);
-void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *temp, int packageCount, uint8_t *flags);
-void fill_header(uint8_t *header, uint8_t ID, uint8_t *databytes, int dataLength, int *packageCount, uint8_t *flags);
-uint8_t set_Flags(uint8_t *flags);
-void set_ACK_Flag(uint8_t *flags, uint8_t val);
+void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *temp, int packageCount, uint8_t *last_CRC);
+void fill_header(uint8_t *header, uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *flags, uint8_t *lastCRC);
+int UART_ACK();
+void set_ACK_Flag(uint8_t *flags, uint8_t ack);
+void set_Req_to_send_Flag(uint8_t *flags, uint8_t req_to_send);
+void set_Req_to_send_Flag(uint8_t *flags, uint8_t rdy_to_rcv);
+void set_Start_Flag(uint8_t *flags, uint8_t start);
+void set_End_Flag(uint8_t *flags, uint8_t end);
 
 /**Functions to receive**/
 int UART_Recv_Data();

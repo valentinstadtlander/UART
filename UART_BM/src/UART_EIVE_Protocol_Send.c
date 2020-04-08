@@ -14,22 +14,9 @@
 #include "UART_io.h"
 #include "xparameters.h"
 
-/**Masks for Flags**/
-#define ACK_MASK            	0b10000000
-#define REQ_TO_SEND_MASK    	0b01000000
-#define READY_TO_RECV_MASK  	0b00100000
-#define START_MASK          	0b00010000
-#define END_MASK            	0b00001000
 
-/**Flags number decimal**/
-#define ACK_DEC            		128
-#define REQ_TO_SEND_DEC    		64
-#define READY_TO_RECV_DEC  		32
-#define START_DEC          		16
-#define END_DEC            		8
-
-
-int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength) {
+int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength)
+{
 
 	int packageCount = package_count(dataLength);
 	uint8_t temp[BUFFER_SIZE * packageCount];
@@ -41,8 +28,8 @@ int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength) {
 	uint8_t flags;
 
 	//Request to send, CRC initval = 0x00
-	lastCRC = 0x00;
-	request_to_send(ID, &temp, &lastCRC);
+	lastCRC_send = 0x00;
+	request_to_send(ID, &temp, &lastCRC_send);
 
 	//send request to send
 	UART_Send(temp, 1);
@@ -122,7 +109,8 @@ void request_to_send(uint8_t ID, uint8_t *temp, uint8_t *lastCRC)
  *
  * returns the needed packages to send all the databytes
  */
-int package_count(int dataLength) {
+int package_count(int dataLength)
+{
 	if (dataLength % PACKAGE_DATA_SIZE > 0)
 		return (dataLength / PACKAGE_DATA_SIZE + 1);
 	else
