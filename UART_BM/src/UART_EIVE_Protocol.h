@@ -15,15 +15,48 @@
 #include "xparameters.h"
 #include "xuartps.h"
 
+/*************************************************************************************/
+
+/** Size of package data and header **/
 #define PACKAGE_DATA_SIZE 28
+#define HEADER_SIZE 4
+
+/** ACK and NACK **/
+#define ACK 1
+#define NACK 0
+
+
+#define EMPTY_DATA_LENGTH 0
+
+/** Identification mask for TM/TC **/
+#define TC_MASK		0b00000000
+#define TM_MASK		0b11110000
+
+/** Identification numbers for TM/TC **/
+#define CAMERA_TC	0b00000000
+#define CAMERA_TM	0b11110000
+
+#define UART_TC		0b00001010
+#define UART_TM		0b11111010
+
+#define BRAM_TC		0b00000101
+#define BRAM_TM		0b11110101
+
+#define CPU_TC		0b00001111
+#define CPU_TM		0b11111111
+
+#define DOWNLINK_TC	0b00001001
+#define DOWNLINK_TM	0b11111001
+
+#define DAC_TC		0b00000110
+#define DAC_TM		0b11110110
+
 
 /** Header position numbers**/
 #define ID_POS  		0
 #define CRC_POS 		1
 #define DATA_SIZE_POS 	2
 #define FLAGS_POS 		3
-
-
 
 /**Functions to send**/
 int UART_Send_Data(u8 ID, u8 *databytes[], int dataLength);
