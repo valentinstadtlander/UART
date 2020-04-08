@@ -72,9 +72,12 @@
 #define START_DEC          		16
 #define END_DEC            		8
 
+<<<<<<< Updated upstream
 //Long buffer for receiving data
 uint8_t databuffer[357143];
 
+=======
+>>>>>>> Stashed changes
 /**Functions to send**/
 int UART_Send_Data(u8 ID, u8 *databytes[], int dataLength);
 void request_to_send(uint8_t ID, uint8_t *temp, int packageCount);
