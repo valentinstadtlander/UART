@@ -316,7 +316,7 @@ int send_failure(uint8_t *last_crc, uint8_t *old_id)
 	fill_header(header, *old_id, empty_data, EMPTY_DATA_LENGTH, &failure_flags, last_crc);
 
 	//send answer package
-	int status = UART_answer();
+	int status = UART_answer(header);
 
 	return status;
 }
@@ -336,23 +336,28 @@ int send_success(uint8_t *last_crc, uint8_t *old_id, uint8_t *flags)
 	uint8_t header[HEADER_SIZE];
 
 	//empty data array
-	uint8_t empty_data[] = {0};
+	uint8_t empty_data[PACKAGE_DATA_SIZE] = {0};
 
 	//fill the header for the package to send
 	fill_header(header, *old_id, empty_data, EMPTY_DATA_LENGTH, flags, last_crc);
 
 	//send answer package
-	int status = UART_answer();
+	int status = UART_answer(header);
 
 	return status;
 
 }
 
 /*
- * !!! Noch zu deklarieren !!!
+ *
+ *
+ *
  */
-int UART_answer()
+int UART_answer(uint8_t *header)
 {
+	uint8_t temp[BUFFER_SIZE] = {header[ID_POS], header[CRC_POS], header[DATA_SIZE_POS], header[FLAGS_POS]};
+
+	UART_Send(temp, 1);
 
 	return XST_SUCCESS;
 }

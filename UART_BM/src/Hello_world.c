@@ -22,7 +22,7 @@ int UART_Send_Hello_World(XUartPs *UartDevice);
 int UART_Recv_Hello_World(XUartPs *UartDevice);
 
 /**
- * Main Method
+ * Main Method for UART
  */
 int main(void)
 {
@@ -35,7 +35,11 @@ int main(void)
 
 
 /**
+<<<<<<< Updated upstream
  * UART_Hello_World Method for sending
+=======
+ * UART_Hello_World Methods
+>>>>>>> Stashed changes
  */
 
 int UART_Send_Hello_World(XUartPs *UartDevice)
@@ -56,7 +60,12 @@ int UART_Send_Hello_World(XUartPs *UartDevice)
 }
 
 /*
+<<<<<<< Updated upstream
  * UART_Hello_World Method for receiving
+=======
+ * Receiving method
+ *
+>>>>>>> Stashed changes
  */
 int UART_Recv_Hello_World(XUartPs *UartDevice)
 {
@@ -64,3 +73,4 @@ int UART_Recv_Hello_World(XUartPs *UartDevice)
 	UART_Send_Buffer(RecvBuffer);
 	return XST_SUCCESS;
 }
+
