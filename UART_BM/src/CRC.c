@@ -46,7 +46,7 @@ uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte)
  *
  * returns the calculated 8-bit crc value for the whole message
  */
-uint8_t calc_crc8(uint8_t bytes[], int length, uint8_t crc_initval)
+uint8_t calc_crc8_for_data(uint8_t bytes[], int length, uint8_t crc_initval)
 {
 	uint8_t crc_val = crc_initval;
 	for(int i = 0; i < length; i++)
@@ -57,18 +57,31 @@ uint8_t calc_crc8(uint8_t bytes[], int length, uint8_t crc_initval)
 	return crc_val;
 }
 
+uint8_t calc_crc8(uint8_t *send_array, uint8_t crc_initval)
+{
+	uint8_t temp31[BUFFER_SIZE - 1];
+
+	for(int i = 0; i < CRC_POS; i++)
+	{
+		temp31[i] = send_array[i];
+	}
+
+	for(int j = CRC_POS; j < BUFFER_SIZE - 1; j++)
+	{
+		temp31[j] = send_array[j + 1];
+	}
+
+	return calc_crc8_for_data(temp31, BUFFER_SIZE - 1, crc_initval);
+}
+
 /*
  *
  */
-int check_crc(uint8_t crc_val, uint8_t *header, uint8_t *data, uint8_t crc_initval)
+int check_crc(uint8_t crc_val, uint8_t *rcv_buffer, uint8_t crc_initval)
 {
 	uint8_t calculated_crc;
 
-	//temp array for crc check
-	uint8_t temp[31] = {header[ID_POS], header[DATA_SIZE_POS], header[FLAGS_POS], *data}; //check
-
-
-	calculated_crc = calc_crc8(temp, BUFFER_SIZE - 1, crc_initval);
+	calculated_crc = calc_crc8(rcv_buffer, crc_initval);
 
 	if(calculated_crc != crc_val)
 		return XST_FAILURE;
