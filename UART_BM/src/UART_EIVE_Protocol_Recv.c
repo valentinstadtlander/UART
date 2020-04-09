@@ -13,7 +13,6 @@
 /*
  * Receive data if its available.
  *
- *
  * @return:
  *
  */
@@ -76,6 +75,9 @@ int receive()
 }
 
 /*
+ *
+ *
+ *
  *
  */
 int connection_establishment(uint8_t *last_crc_send, uint8_t *new_flags, uint8_t *conn_id)
@@ -296,7 +298,7 @@ int extract_header(uint8_t *rcvBuffer, uint8_t *header, uint8_t *data)
  * @param: *last_crc: the address of the last sent CRC-value
  * 		   *old_id:	  the address of the id of the received package
  *
- * return: The success or failure of sending the answer
+ * @return: The success or failure of sending the answer
  */
 int send_failure(uint8_t *last_crc, uint8_t *old_id)
 {
@@ -328,7 +330,7 @@ int send_failure(uint8_t *last_crc, uint8_t *old_id)
  * 		   *old_id:	  the address of the id of the received package
  * 		   *flags: 	  the address of the flags to send
  *
- * return: The success or failure of sending the answer
+ * @return: The success or failure of sending the answer
  */
 int send_success(uint8_t *last_crc, uint8_t *old_id, uint8_t *flags)
 {
@@ -349,9 +351,11 @@ int send_success(uint8_t *last_crc, uint8_t *old_id, uint8_t *flags)
 }
 
 /*
+ * Sends the answer package with empty data
  *
+ * @param: *header: the filled header array
  *
- *
+ * @return: The success or failure of sending the answer.
  */
 int UART_answer(uint8_t *header)
 {
