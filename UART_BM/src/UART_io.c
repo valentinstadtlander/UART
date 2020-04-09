@@ -110,7 +110,7 @@ int UART_Recv_Buffer() {
  */
 int UART_Send(u8 *data, int packageCount)
 {
-	for(int packageNumb = 0; packageNumb < packageCount; packageNumb++)
+	for(int packageNumb = 0; packageNumb < packageCount; packageNumb++) //unnecessary
 	{
 		for(int byteNumb = 0; byteNumb < 31; byteNumb++)
 		{

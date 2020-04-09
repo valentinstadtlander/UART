@@ -1,4 +1,5 @@
 /**
+
  *
  *
  *
@@ -13,6 +14,9 @@
 #include "xil_printf.h"
 #include "UART_io.h"
 /*************************************************************************************/
+
+
+
 
 int UART_Send_Hello_World(XUartPs *UartDevice);
 int UART_Recv_Hello_World(XUartPs *UartDevice);
@@ -31,7 +35,7 @@ int main(void)
 
 
 /**
- * UART_Hello_World Method
+ * UART_Hello_World Method for sending
  */
 
 int UART_Send_Hello_World(XUartPs *UartDevice)
@@ -51,6 +55,9 @@ int UART_Send_Hello_World(XUartPs *UartDevice)
 	return XST_SUCCESS;
 }
 
+/*
+ * UART_Hello_World Method for receiving
+ */
 int UART_Recv_Hello_World(XUartPs *UartDevice)
 {
 	UART_Recv_Buffer();

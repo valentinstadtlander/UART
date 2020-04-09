@@ -25,80 +25,73 @@ int UART_Send_Data(uint8_t ID, uint8_t *databytes, int dataLength)
 	uint8_t temp32[BUFFER_SIZE];
 	uint8_t header[4];
 	uint8_t data[PACKAGE_DATA_SIZE];
+
+	/*
+	 * lastCRC_send saves the calculated CRC for the last send package
+	 * submittedCRC always saves the new received CRC
+	 * lastCRC_rcv saves the last received CRC for the initval for checking the received package
+	 */
 	uint8_t lastCRC_send, lastCRC_rcvd = 0x00, submittedCRC;
-	uint8_t flags;
+
+	uint8_t flags = 0x00;
 	XStatus status = XST_NO_DATA;
 	int timer = 0;
 
 	//Request to send, CRC initval = 0x00
 	lastCRC_send = 0x00;
-	request_to_send(ID, &temp, &lastCRC_send);
+	request_to_send(ID, &temp, &lastCRC_send, &flags);
 
 	//send request to send
 	UART_Send(temp, 1);
 
-	while(status != XST_SUCCESS)
+	while(wait_on_answer(temp) != XST_SUCCESS);
+
+	//fill header, data, flags and submittedCRC with the received values
+	get_received_data(&header, &data, &flags, &submittedCRC);
+
+	//check received CRC
+	if(check_rcvd_CRC(submittedCRC, &header, &data, &lastCRC_rcvd) != XST_SUCCESS)
 	{
-		status = UART_Recv_Buffer();
-
-		if(status != XST_NO_DATA || status != XST_SUCCESS)
-			return XST_FAILURE;
-
-		timer++;
-
-		if(timer == MAX_TIMER)
-		{
-			//Timeout
-			//send new request to send
-			UART_Send(temp, 1);
-
-			//reset timer
-			timer = 0;
-		}
+		send_NACK(); //define method
+		uint8_t
+		while(wait_on_answer() != XST_SUCCESS)
 	}
 
-	//Receive Buffer is filled
-	extract_header(RecvBuffer, &header, &data);
-	flags = header[FLAGS_POS];
-	submittedCRC = header[CRC_POS];
-
-	//check ready to receive
-	check_ready_to_receive()
 
 
 
 
-	if(check_crc(submittedCRC, header, data, 0x00) == XST_SUCCESS) //crc is okay
+
+	if(check_rcvd_CRC(submittedCRC, &header, &data, &lastCRC_rcvd) == XST_SUCCESS)
 	{
-		//check ACK Flag
-		if(check_ACK_flag(&flags) == 1)
+		//Received CRC is correct
+		//check ACK
+		if((header[FLAGS_POS] | ACK_MASK) == ACK_DEC && (header[FLAGS_POS] | READY_TO_RECV_MASK) == READY_TO_RECV_DEC)
 		{
 			//ACK
-		} else
-		{
-			//NACK
-			UART_Send_Data(ID, &databytes, dataLength); //recursive method call possible??
-		}
-
-
-		if(check_ACK_flag(&flags) == 1 && check_ready_to_recv_flag(&flags) == 1)
-		{
+			//ready to receive
+			send_data(); //define method
 
 		}
-	} else
+		else
+		{
+			/*
+			 * CRC is correct
+			 * NACK
+			 * NOT ready to receive
+			 * Restart
+			 */
+			flags = REQ_TO_SEND_MASK & ACK_MASK;
+			UART_Send_Data(ID, &databytes, dataLength); //recursive method call
+		}
+	}
+	else
 	{
-		set_ACK_Flag(&flags, NACK);
-		flags &= ACK_MASK;
-
-
-
-		//fill temp32 array
-		temp32[ID_POS] = ID;
-		temp32[CRC_POS] = lastCRC;
-		temp32[DATA_SIZE_POS] = dataLength;
-		temp32[FLAGS_POS] = flags;
+		//Received CRC is wrong
+		//send NACK
 
 	}
+
 
 
 
@@ -116,9 +109,12 @@ int UART_Send_Data(uint8_t ID, uint8_t *databytes, int dataLength)
  *
  *configures a package to send a request to send and saves the first CRC
  */
-void request_to_send(uint8_t ID, uint8_t *temp, uint8_t *lastCRC)
+void request_to_send(uint8_t ID, uint8_t *temp, uint8_t *lastCRC, uint8_t *flags)
 {
-	uint8_t flags = REQ_TO_SEND_MASK;
+	if(flags == 0x00)
+	{
+		*flags = REQ_TO_SEND_MASK;
+	}
 	uint8_t data[28] = {0};
 	uint8_t datasize = 0;
 	uint8_t temp_for_CRC[BUFFER_SIZE - 1] = {ID, EMPTY_DATA_LENGTH, flags, data};
@@ -145,24 +141,146 @@ int package_count(int dataLength)
 }
 
 /*
- *Method to check if the receiver is ready to receive data
+ * Checks if the received CRC matches with the calculated CRC of the package
  *
- *@*flags 	received flags
+ * @param: 	submittedCRC, CRC value delivered by the receiver
+ * @param:	*header, header of the received package
+ * @param:	*data, data of the received package
+ * @param:	*lastCRC_rcvd, CRC value of the previously received package, 0x00 for the request to send answer
  *
- *Returns 1 if the receiver is ready to receive, 0 if the receiver is not ready to receive
+ * @return:	XST_SUCCESS if the received CRC matches with the calculated CRC
+ * @return:	XST_FAILURE if it doesn't matches
  */
-int check_ready_to_receive(uint8_t *flags)
+int check_rcvd_CRC(uint8_t submittedCRC, uint8_t *header, uint8_t *data, uint8_t *lastCRC_rcvd)
 {
-	uint8_t rdy_2_rcv_flg = *flags | READY_TO_RECV_MASK;
-
-	if(rdy_2_rcv_flg == READY_TO_RECV_DEC)
-		return 1;
+	if(check_crc(submittedCRC, &header, &data, &lastCRC_rcvd) == XST_SUCCESS) //check passing argument 4
+	{
+		//CRC value is correct
+		return XST_SUCCESS;
+	}
 	else
-		return 0;
+		return XST_FAILURE;
 }
 
 /*
+ *
+ */
+void get_received_data(uint8_t *header, uint8_t *data, uint8_t *flags, uint8_t *submittedCRC)
+{
+	extract_header(RecvBuffer, &header, &data);
+	flags = header[FLAGS_POS];
+	submittedCRC = header[CRC_POS];
+}
+
+void send_data(uint8_t ID, uint8_t *databytes, int dataLength, int packageCount, uint8_t *lastCRC_send, uint8_t *lastCRC_rcvd, uint8_t *temp)
+{
+	uint8_t send_array[BUFFER_SIZE];
+
+	uint8_t header[HEADER_SIZE];
+	uint8_t data[PACKAGE_DATA_SIZE];
+	uint8_t flags;
+	uint8_t submittedCRC;
+
+	//fill array temp with the databytes and the header to send
+	fill_packages(ID, dataLength, &databytes, &temp, packageCount, lastCRC_send);
+
+	for(int packageCounter = 0; packageCounter < packageCount; packageCounter++)
+	{
+		//first package
+		if(packageCounter == 0)
+		{
+			for(int i = 0; i < BUFFER_SIZE; i++)
+			{
+				send_array[i] = temp[i];
+				UART_Send(send_array, 1);
+
+				//wait on receive buffer to be filled
+				wait_on_answer(&send_array);
+
+				//get received information
+				get_received_data(&header, &data, &flags, &submittedCRC);
+
+				//check received CRC
+				//check again!!!
+				if(check_rcvd_CRC(submittedCRC, &header, &data, &lastCRC_rcvd) == XST_SUCCESS)
+				{
+					//Received CRC is correct
+					//check ACK
+					if((header[FLAGS_POS] | ACK_MASK) == ACK_DEC)
+					{
+						//ACK
+						//continue with next package
+					}
+					else
+					{
+						/*
+						 * CRC is correct
+						 * NACK
+						 * NOT ready to receive
+						 * Restart
+						 */
+						UART_Send_Data(ID, &databytes, dataLength); //recursive method call
+					}
+				}
+				else
+				{
+					//Received CRC is wrong
+					//send NACK
+
+					//wait on answer to check again
+				}
+		}
+
+	}
+
+		//middle packages
+		else if(packageCounter != 0 && packageCounter != packageCount - 1)
+		{
+
+		}
+
+		//last package
+		else
+		{
+
+		}
+	}
+}
+
+/*
+ *
+ */
+int wait_on_answer(uint8_t *send_array)
+{
+	XStatus status = XST_NO_DATA;
+	int timer;
+
+	while(status != XST_SUCCESS)
+	{
+		status = UART_Recv_Buffer();
+
+		if(status != XST_NO_DATA || status != XST_SUCCESS)
+			return XST_FAILURE;
+
+		timer++;
+
+		if(timer == MAX_TIMER)
+		{
+			//Timeout
+			//send again array to send
+			UART_Send(send_array, 1);
+
+			//reset timer
+			timer = 0;
+		}
+	}
+	return XST_SUCCESS;
+}
+
+
+/*
  * Method to fill the packages to send
+
  *
  * @ID 				Identification number of the package to send
  * @dataLength		length of the data to send, must be given by the user
@@ -171,11 +289,11 @@ int check_ready_to_receive(uint8_t *flags)
  * 					which is filled with the header and the databytes
  * @packageCount	numbers of packages needed to send all the databytes
  * @flags			uint8_t number with the flags which are set
- * @last_CRC		CRC value of the last calculation
+ * @last_CRC		CRC value of the last calculation of the last send package
  *
  * fills the variable temp with the databytes and the headers
  */
-void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *temp, int packageCount, uint8_t *last_CRC)
+void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *temp, int packageCount, uint8_t *lastCRC_send)
 {
 	/*Temporary arrays for header and data*/
 	uint8_t header[4];
@@ -198,7 +316,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *te
 			 * flags for the start package
 			 */
 			set_Start_Flag(*flags, 1);
-			fill_header(header, ID, temp28, PACKAGE_DATA_SIZE, &i, flags, &last_CRC);
+			fill_header(header, ID, temp28, PACKAGE_DATA_SIZE, &i, flags, &lastCRC_send);
 
 			/*fill temporary array temp with the headers*/
 			for (int k = 28; k < 32; k++)
@@ -221,7 +339,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *te
 			/* flags for the middle packages
 			 */
 			flags = 0b00000000;
-			fill_header(header, ID, temp28, PACKAGE_DATA_SIZE, &i, flags, &last_CRC);
+			fill_header(header, ID, temp28, PACKAGE_DATA_SIZE, &i, flags, &lastCRC_send);
 
 			/*fill temporary array temp with the headers*/
 			for (int k = 28; k < 32; k++)
@@ -255,7 +373,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *te
 			/*fill header with the given information*/
 			/*flags for the end package*/
 			set_End_Flag(*flags, 1);
-			fill_header(header, ID, temp28, restsize, &i, flags, &last_CRC);
+			fill_header(header, ID, temp28, restsize, &i, flags, &lastCRC_send);
 
 			/*fill temporary array temp with the headers*/
 			for (int k = 28; k < 32; k++)
@@ -269,24 +387,25 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *te
 
 /*
  *Fill Header with submitted parameters
+
  *
  *@*header		the header is saved in this parameter
  *@ID 			Identification number of the package to send
  *@*databytes	data to send
  *@dataLength	length of the data to send
  **flags		flags of the package which is going to be send
- **lastCRC		last calculated CRC for the new CRC calculation
+ **lastCRC_send	last calculated CRC of the last send package
  *
  */
-void fill_header(uint8_t *header, uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *flags, uint8_t *lastCRC)
+void fill_header(uint8_t *header, uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *flags, uint8_t *lastCRC_send)
 {
 	uint8_t temp_array_CRC[] = { ID, dataLength, flags, *databytes }; //funktioniert??
 
 	/*calculate new CRC value*/
-	uint8_t newCRC = calc_crc8(temp_array_CRC, dataLength, &lastCRC);
+	uint8_t newCRC = calc_crc8(temp_array_CRC, dataLength, lastCRC_send);
 
 	/*save new CRC value in old variable*/
-	(*lastCRC) = newCRC;
+	(*lastCRC_send) = newCRC;
 
 	/*fill header*/
 	header[ID_POS] = ID;
