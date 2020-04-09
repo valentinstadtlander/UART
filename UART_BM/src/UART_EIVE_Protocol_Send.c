@@ -14,18 +14,21 @@
 #include "UART_io.h"
 #include "xparameters.h"
 
+#define MAX_TIMER		10000
 
-int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength)
+
+int UART_Send_Data(uint8_t ID, uint8_t *databytes, int dataLength)
 {
 
 	int packageCount = package_count(dataLength);
 	uint8_t temp[BUFFER_SIZE * packageCount];
 	uint8_t temp32[BUFFER_SIZE];
 	uint8_t header[4];
-	uint8_t data[BUFFER_SIZE];
-	XStatus status;
+	uint8_t data[PACKAGE_DATA_SIZE];
 	uint8_t lastCRC_send, lastCRC_rcvd = 0x00, submittedCRC;
 	uint8_t flags;
+	XStatus status = XST_NO_DATA;
+	int timer = 0;
 
 	//Request to send, CRC initval = 0x00
 	lastCRC_send = 0x00;
@@ -34,33 +37,57 @@ int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength)
 	//send request to send
 	UART_Send(temp, 1);
 
-	//check ready to receive
-	//check ACK
-	//check CRC
-	UART_Recv_Buffer(); //check method and using!!
+	while(status != XST_SUCCESS)
+	{
+		status = UART_Recv_Buffer();
+
+		if(status != XST_NO_DATA || status != XST_SUCCESS)
+			return XST_FAILURE;
+
+		timer++;
+
+		if(timer == MAX_TIMER)
+		{
+			//Timeout
+			//send new request to send
+			UART_Send(temp, 1);
+
+			//reset timer
+			timer = 0;
+		}
+	}
+
+	//Receive Buffer is filled
 	extract_header(RecvBuffer, &header, &data);
 	flags = header[FLAGS_POS];
 	submittedCRC = header[CRC_POS];
 
+	//check ready to receive
+	check_ready_to_receive()
+
+
+
+
 	if(check_crc(submittedCRC, header, data, 0x00) == XST_SUCCESS) //crc is okay
 	{
 		//check ACK Flag
-		if(check_ACK_flag(*flags) == 1)
+		if(check_ACK_flag(&flags) == 1)
 		{
-
+			//ACK
 		} else
 		{
+			//NACK
 			UART_Send_Data(ID, &databytes, dataLength); //recursive method call possible??
 		}
 
 
-		if(check_ACK_flag(*flags) == 1 && check_ready_to_recv_flag(*flags) == 1)
+		if(check_ACK_flag(&flags) == 1 && check_ready_to_recv_flag(&flags) == 1)
 		{
 
 		}
 	} else
 	{
-		set_ACK_Flag(*flags, NACK);
+		set_ACK_Flag(&flags, NACK);
 		flags &= ACK_MASK;
 
 
@@ -98,7 +125,7 @@ void request_to_send(uint8_t ID, uint8_t *temp, uint8_t *lastCRC)
 	uint8_t newCRC = calc_crc8(temp_for_CRC, BUFFER_SIZE-1, lastCRC);
 	uint8_t temp32[BUFFER_SIZE] = {ID, newCRC, datasize, flags, data};
 
-	&lastCRC = newCRC;
+	(*lastCRC) = newCRC;
 	temp = temp32;
 }
 
@@ -115,6 +142,23 @@ int package_count(int dataLength)
 		return (dataLength / PACKAGE_DATA_SIZE + 1);
 	else
 		return (dataLength / PACKAGE_DATA_SIZE);
+}
+
+/*
+ *Method to check if the receiver is ready to receive data
+ *
+ *@*flags 	received flags
+ *
+ *Returns 1 if the receiver is ready to receive, 0 if the receiver is not ready to receive
+ */
+int check_ready_to_receive(uint8_t *flags)
+{
+	uint8_t rdy_2_rcv_flg = *flags | READY_TO_RECV_MASK;
+
+	if(rdy_2_rcv_flg == READY_TO_RECV_DEC)
+		return 1;
+	else
+		return 0;
 }
 
 /*
@@ -291,7 +335,7 @@ void set_Req_to_send_Flag(uint8_t *flags, uint8_t req_to_send)
  * @*flags 		flags array
  * @rdy_to_rcv 	bit req_to_send
  */
-void set_Req_to_send_Flag(uint8_t *flags, uint8_t rdy_to_rcv)
+void set_Rdy_to_rcv_Flag(uint8_t *flags, uint8_t rdy_to_rcv)
 {
 	if(rdy_to_rcv == 1)
 		*flags |= READY_TO_RECV_MASK;
