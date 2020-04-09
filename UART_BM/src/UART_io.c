@@ -90,10 +90,10 @@ int UART_Recv_Buffer() {
 
 	/* Break if no data  */
 	 if(!XUartPs_IsReceiveData(Uart_Ps.Config.BaseAddress))
-		 return NO_DATA_AVAILABLE;
+		 return XST_NO_DATA;
 
 
-	/* Block receiving the buffer. */
+	/* Block for receiving the buffer. */
 	u32 ReceivedCount = 0;
 	while (ReceivedCount < BUFFER_SIZE) {
 		ReceivedCount += XUartPs_Recv(&Uart_Ps, &RecvBuffer[ReceivedCount],
