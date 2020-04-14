@@ -174,14 +174,14 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t rcvd_id, uint8_t l
 	//timer for receiving data
 	int timer = 1;
 
-	int success = 1;
+	int success = SET;
 
 	/*
 	 * while not_end_flag
 	 *
 	 * loop for receiving long data until end_flag is set
 	 */
-	while(end != 1)
+	while(end != SET)
 	{
 		//Receiving answer
 		while(status == XST_NO_DATA)
@@ -193,7 +193,7 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t rcvd_id, uint8_t l
 			// -> Send answer and wait for data
 			if(timer == 0)
 			{
-				if(success == 1)
+				if(success == SET)
 					// success == 1 -> send success
 					send_success(&last_crc_send, rcvd_id, flags_to_send);
 				else
@@ -245,7 +245,6 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t rcvd_id, uint8_t l
 			//failure
 			timer = 0;
 			status = XST_NO_DATA;
-			//send_failure(&last_crc_send, &old_id);
 			continue;
 		}
 
@@ -363,7 +362,7 @@ int send_success(uint8_t *last_crc, uint8_t id, uint8_t flags)
 	uint8_t header[HEADER_SIZE];
 
 	//fill the header for the package to send
-	fill_header(header, id, flags, last_crc);
+	fill_header_for_empty_data(header, id, flags, last_crc);
 
 	//send answer package
 	int status = UART_answer(header);

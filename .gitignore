@@ -2,3 +2,5 @@
 UART_BM/Debug/
 
 fsbl_bsp/
+
+fsbl/
