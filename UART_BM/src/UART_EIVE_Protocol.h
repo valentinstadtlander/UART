@@ -59,15 +59,131 @@
 //Long buffer for receiving data
 uint8_t databuffer[357143];
 
-/******************** Functions to send ********************/
+/********************** Functions to send **********************/
 
-int UART_Send_Data(uint8_t ID, uint8_t *databytes[], int dataLength);
-void request_to_send(uint8_t ID, uint8_t *temp, uint8_t *lastCRC);
+/*
+ * Main Method of the EIVE UART Protocol to send data
+ *
+ * @param:	ID		Identification number of the data to send
+ * @param:	*databytes	Pointer to the data which is going to be send
+ * @param:	dataLength	Length of the data which is going to be send
+ *
+ * @return:	XST_SUCCES	If the data was send properly
+ * @return:	XST_FAILURE	If the data was not send properly
+ *
+ * This method uses the connection_establishment() -Method to establish a connection between the sender and the receiver.
+ * It also uses the send_data() -method to send the transfered data to the receiver after a connection was established.
+ * It returns an error if the data could not to be send and a success, if the transmission was possible
+ */
+int UART_Send_Data(uint8_t ID, uint8_t *databytes, int dataLength);
+
+/*
+ * Method to establish a connection to the receiver
+ *
+ * @param:	ID				Identification number of the package to send
+ * @param:	*databytes		Pointer to the array of data which are going to be send
+ * @param:	dataLength		Length of the data which is going to be send
+ * @param:	*lastCRC_send	Pointer to the last send CRC value
+ * @param:	*lastCRC_rcvd	Pointer to the last received CRC value
+ *
+ * @return:	XST_SUCCES	If the connection was established properly
+ * @return:	XST_FAILURE	If the connection was not established properly
+ */
+int connect(uint8_t ID, uint8_t *databytes, uint8_t dataLength, uint8_t *lastCRC_send, uint8_t *lastCRC_rcvd);
+
+/*
+ *Request to send, to establish a connection
+ *
+ *@param:	ID			Identification number of the package to send
+ *@param:	*lastCRC	Pointer, last CRC value to save the new CRC value for the next package
+ *
+ *Configures a package to send a request to send and saves the first CRC
+ */
+int send_request_to_send(uint8_t ID, uint8_t *temp32, uint8_t *lastCRC_send, uint8_t *flags);
+
+/*
+ *Request to send, to establish a connection
+ *
+ *@param:	ID			Identification number of the package to send
+ *@param:	*lastCRC	Pointer, last CRC value to save the new CRC value for the next package
+ *
+ *Configures a package to send a request to send and saves the first CRC
+ */
+int send_request_to_send(uint8_t ID, uint8_t *temp32, uint8_t *lastCRC_send, uint8_t *flags);
+
+/*
+ * Package counter
+ *
+ * @param:	dataLength	number of bytes of the data to send
+ *
+ * returns the number of the needed packages to send all the databytes
+ */
 int package_count(int dataLength);
-void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *temp, int packageCount, uint8_t *last_CRC);
-void fill_header(uint8_t *header, uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *flags, uint8_t *lastCRC);
-int wait_on_answer(uint8_t *send_array, uint8_t id, uint8_t *lastCRC_send);
-int UART_ACK();
+
+/*
+ * Method to save the submitted header, data, flags and CRC from the receiver
+ *
+ * @param:	*header			Pointer to an array of the size of HEADER_SIZE to save the received header
+ * @param:	*data			Pointer to an array of the size of PACKAGE_DATA_SIZE to save the received data
+ * @param:	*flags			Pointer, to save the received Flags
+ * @param: 	*submittedCRC	Pointer, to save the submitted CRC value
+ *
+ * This method stores in the delivered parameters the received information
+ */
+void get_received_data(uint8_t *header, uint8_t *data, uint8_t *flags, uint8_t *submittedCRC);
+
+/*
+ * Method to send the data
+ *
+ * @param:	ID				Identification number of the package to send
+ * @param:	*databytes		Pointer to the array of data which are going to be send
+ * @param:	dataLength		Length of the data which is going to be send
+ * @param:	*lastCRC_send	Pointer to the last send CRC value
+ * @param:	*lastCRC_rcvd	Pointer to the last received CRC value
+ *
+ * @return:	XST_SUCCES	If the data was send properly
+ * @return:	XST_FAILURE	If the data was not send properly
+ */
+int send_data(uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *lastCRC_send, uint8_t *lastCRC_rcvd);
+
+/*
+ * Method to wait on an answer of the receiver
+ *
+ * @param:	*send_array:	pointer to the array which is going to be send again if the timer expires and the RecvBuffer does not get filled
+ *							NULL if the send_array is NACK
+ * @param:	ID				Identification number of the package to send
+ * @param:	*lastCRC_send	Pointer to the last send CRC value
+ *
+ * @return:	XST_SUCCES		If an answer was received
+ * @return:	XST_FAILURE		If no answer was received
+ */
+int wait_on_answer(uint8_t *send_array, uint8_t ID, uint8_t *lastCRC_send);
+
+/*
+ * Method to fill the packages to send
+ *
+ * @param:	ID 				Identification number of the package to send
+ * @param: 	dataLength		length of the data to send, must be given by the user
+ * @param:	*databytes		Pointer to the data to send
+ * @param:	temp			Pointer to the temporary array in the main method with the length of BUFFER_SIZE * packageCount,
+ * 							which is filled with the header and the databytes
+ * @param: 	packageCount	numbers of packages needed to send all the databytes
+ *
+ * Fills the submitted variable temp with the databytes and the headers
+ */
+void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp, int packageCount);
+
+/*
+ * Fill Header with submitted parameters
+ *
+ * @param:	*header			Pointer to store the header
+ * @param:	ID 				Identification number of the package to send
+ * @param: 	flags			Flags of the package which is going to be send
+ * @param:	*lastCRC_send	Pointer to the last calculated CRC of the last send package
+ *
+ * This method fills the header of empty packages which are going to be send
+ */
+void fill_header_for_empty_data(uint8_t *header, uint8_t ID, uint8_t flags, uint8_t *lastCRC_send);
 
 /******************** Functions to receive ********************/
 

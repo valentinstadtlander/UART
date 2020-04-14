@@ -1,8 +1,5 @@
 /*
  * UART_EIVE_Protocol.c
-
-
-
  *
  *  Created on: 27.03.2020
  *      Author: Valentin & Tobias
@@ -36,18 +33,18 @@ int UART_Send_Data(uint8_t ID, uint8_t *databytes, int dataLength)
 	 * submittedCRC always saves the new received CRC
 	 * lastCRC_rcv saves the last received CRC for the initval for checking the received package
 	 */
-	uint8_t lastCRC_send, lastCRC_rcvd = 0x00, submittedCRC;
+	uint8_t lastCRC_send, lastCRC_rcvd = 0x00;
 	int status;
 
 	//connection establishment
-	status = connection_establishment(ID, databytes, dataLength, &lastCRC_send, &lastCRC_rcvd);
+	status = connect(ID, databytes, dataLength, &lastCRC_send, &lastCRC_rcvd);
 
 	//return Failure if connection could not be established
 	if(status == XST_FAILURE)
 		return XST_FAILURE;
 
 	//send data
-	status = send_data(ID, databytes, dataLength, lastCRC_send, lastCRC_rcvd);
+	status = send_data(ID, databytes, dataLength, &lastCRC_send, &lastCRC_rcvd);
 
 	//return failure if the data could not be send
 	if(status == XST_FAILURE)
@@ -69,13 +66,17 @@ int UART_Send_Data(uint8_t ID, uint8_t *databytes, int dataLength)
  * @return:	XST_SUCCES	If the connection was established properly
  * @return:	XST_FAILURE	If the connection was not established properly
  */
-int connection_establishment(uint8_t ID, uint8_t *databytes, uint8_t dataLength, uint8_t *lastCRC_send, uint8_t *lastCRC_rcvd)
+int connect(uint8_t ID, uint8_t *databytes, uint8_t dataLength, uint8_t *lastCRC_send, uint8_t *lastCRC_rcvd)
 {
-	int packageCount = package_count(dataLength);
-	uint8_t temp[BUFFER_SIZE * packageCount];
+	//int packageCount = package_count(dataLength);
+	//uint8_t temp[BUFFER_SIZE * packageCount];
 	uint8_t temp32[BUFFER_SIZE];
 	uint8_t header[HEADER_SIZE];
 	uint8_t data[PACKAGE_DATA_SIZE];
+
+	uint8_t submittedCRC = INIT_CRC;
+
+	XStatus status;
 
 	int connection = NACK;
 	int conn_counter = 0;
@@ -87,7 +88,7 @@ int connection_establishment(uint8_t ID, uint8_t *databytes, uint8_t dataLength,
 
 		//Request to send, CRC initval = 0x00
 		lastCRC_send = INIT_CRC;
-		status = send_request_to_send(ID, &temp32, &lastCRC_send, &snd_flags);
+		status = send_request_to_send(ID, temp32, lastCRC_send, &snd_flags);
 
 		//check status of sending
 		if(status != XST_SUCCESS)
@@ -101,22 +102,22 @@ int connection_establishment(uint8_t ID, uint8_t *databytes, uint8_t dataLength,
 			if(succes == 1)
 			{
 				//wait on answer sending again temp32
-				wait_on_answer(temp32, ID, &lastCRC_send);
+				wait_on_answer(temp32, ID, lastCRC_send);
 			}
 			else
 			{
 				//wait on answer sending again NACK
-				wait_on_answer(NULL, ID, &lastCRC_send);
+				wait_on_answer(NULL, ID, lastCRC_send);
 			}
 
 			//fill header, data, receive flags and submittedCRC with the received values
-			get_received_data(&header, &data, &rcv_flags, &submittedCRC);
+			get_received_data(header, data, &rcv_flags, &submittedCRC);
 
 			//check received CRC
-			if(check_crc(submittedCRC, RecvBuffer, lastCRC_rcvd)!= XST_SUCCESS)
+			if(check_crc(submittedCRC, RecvBuffer, *lastCRC_rcvd)!= XST_SUCCESS)
 			{
 				//CRC values defeer, send failure
-				send_failure(&lastCRC_send, ID);
+				send_failure(lastCRC_send, ID);
 			}
 			else
 			{
@@ -167,8 +168,7 @@ int send_request_to_send(uint8_t ID, uint8_t *temp32, uint8_t *lastCRC_send, uin
 		*flags = REQ_TO_SEND_MASK;
 	}
 
-	//anpassen
-	(*lastCRC_send) = calc_crc8(temp_for_CRC, BUFFER_SIZE-1, *lastCRC_send);
+	*lastCRC_send = calc_crc8(temp32, *lastCRC_send);
 
 	temp32[ID_POS] = ID;
 	temp32[CRC_POS] = *lastCRC_send;
@@ -221,8 +221,8 @@ int package_count(int dataLength)
 void get_received_data(uint8_t *header, uint8_t *data, uint8_t *flags, uint8_t *submittedCRC)
 {
 	extract_header(RecvBuffer, header, data);
-	flags = header[FLAGS_POS];
-	submittedCRC = header[CRC_POS];
+	*flags = header[FLAGS_POS];
+	*submittedCRC = header[CRC_POS];
 }
 
 /*
@@ -249,21 +249,22 @@ int send_data(uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *lastCRC_s
 	int status;
 
 	//fill array temp with the databytes and the header to send
-	fill_packages(ID, dataLength, &databytes, temp, packageCount);
+	fill_packages(ID, dataLength, databytes, temp, packageCount);
 
 	int package_counter = 0;
+	int try = 0;
 
-	while(package_counter < packageCount || try = 10)
+	while(package_counter < packageCount || try == 10)
 	{
 		//Get packages
 		for(int i = 0; i < BUFFER_SIZE; i++)
 			send_array[i] = temp[package_counter * BUFFER_SIZE + i];
 
 		//Set acknowledge flag
-		set_ACK_Flag(send_array[FLAGS_POS], ACK);
+		set_ACK_Flag(&send_array[FLAGS_POS], ACK);
 
 		//Calculate CRC value
-		send_array[CRC_POS] = calc_crc8(send_array, lastCRC_send);
+		send_array[CRC_POS] = calc_crc8(send_array, *lastCRC_send);
 
 		//Send package
 		status = UART_Send(send_array, 1);
@@ -283,7 +284,7 @@ int send_data(uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *lastCRC_s
 			//wait on receive buffer to be filled
 			if(succes == 1)
 			{
-				wait_on_answer(&send_array, send_array[ID_POS], send_array[CRC_POS]);
+				wait_on_answer(send_array, send_array[ID_POS], &send_array[CRC_POS]);
 			}
 			else
 			{
@@ -292,12 +293,12 @@ int send_data(uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *lastCRC_s
 			}
 
 			//get received information
-			get_received_data(&header, &data, &flags, &submittedCRC);
+			get_received_data(header, data, &flags, &submittedCRC);
 
 			//check received CRC
-			if(check_crc(submittedCRC, RecvBuffer, lastCRC_rcvd)!= XST_SUCCESS)
+			if(check_crc(submittedCRC, RecvBuffer, *lastCRC_rcvd)!= XST_SUCCESS)
 			{
-				send_failure(&lastCRC_send, ID);
+				send_failure(lastCRC_send, ID);
 				succes = 0;
 			}
 			else
@@ -308,7 +309,7 @@ int send_data(uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *lastCRC_s
 
 		//Received CRC is correct
 		//check ACK
-		if(get_ACK_flag(&flags) != SET)
+		if(get_ACK_flag(flags) != SET)
 		{
 			/* CRC is correct, NACK */
 			continue;
@@ -341,7 +342,7 @@ int wait_on_answer(uint8_t *send_array, uint8_t ID, uint8_t *lastCRC_send)
 
 	if(NULL == send_array)
 	{
-		fill_header(nack_header, ID, &UNSET_ALL_FLAGS, lastCRC_send);
+		fill_header_for_empty_data(nack_header, ID, UNSET_ALL_FLAGS, lastCRC_send);
 	}
 
 	XStatus status = XST_NO_DATA;
@@ -397,12 +398,12 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp
 
 	uint8_t header[HEADER_SIZE] = {ID, INIT_CRC, 0, UNSET_ALL_FLAGS};
 
-	uint8_t *flags;
+	uint8_t *flags = UNSET_ALL_FLAGS;
 
 	for (int i = 0; i < packageCount; i++)
 	{
 		/*first package*/
-		if(i = 0)
+		if(i == 0)
 		{
 			//Fill header[DATA_SIZE_POS]
 			header[DATA_SIZE_POS] = PACKAGE_DATA_SIZE;
@@ -411,7 +412,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp
 			 * fill header with the given information
 			 * flags for the start package
 			 */
-			set_Start_Flag(*flags, SET);
+			set_Start_Flag(flags, SET);
 
 			/*fill temporary array temp with the headers*/
 			for (int k = 0; k < HEADER_SIZE; k++)
@@ -422,7 +423,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp
 			for (int j = HEADER_SIZE; j < BUFFER_SIZE; j++)
 			{
 				/*fill temporary arrays temp*/
-				temp[j] = *databytes[j - HEADER_SIZE];
+				temp[j] = databytes[j - HEADER_SIZE];
 			}
 		}
 
@@ -448,7 +449,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp
 			/*fill temporary arrays temp and temp28*/
 			for (int j = HEADER_SIZE; j < BUFFER_SIZE; j++)
 			{
-				temp[i * BUFFER_SIZE + j] = *databytes[i * PACKAGE_DATA_SIZE + j - HEADER_SIZE];
+				temp[i * BUFFER_SIZE + j] = databytes[i * PACKAGE_DATA_SIZE + j - HEADER_SIZE];
 			}
 		}
 
@@ -462,7 +463,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp
 
 			/*fill header with the given information*/
 			/*flags for the end package*/
-			set_End_Flag(*flags, SET);
+			set_End_Flag(flags, SET);
 
 			/*fill temporary array temp with the headers*/
 			for (int k = 0; k < HEADER_SIZE; k++)
@@ -477,7 +478,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp
 				if(j < restsize)
 				{
 					/*fill with the rest databytes from position 0 to restsize*/
-					temp[i * BUFFER_SIZE + j] = *databytes[i * PACKAGE_DATA_SIZE + j - HEADER_SIZE];
+					temp[i * BUFFER_SIZE + j] = databytes[i * PACKAGE_DATA_SIZE + j - HEADER_SIZE];
 				}
 				else
 				{
@@ -509,7 +510,7 @@ void fill_header_for_empty_data(uint8_t *header, uint8_t ID, uint8_t flags, uint
 	temp_array_CRC[FLAGS_POS] = flags;
 
 	/*calculate new CRC value*/
-	uint8_t newCRC = calc_crc8(temp_array_CRC, dataLength, lastCRC_send);
+	uint8_t newCRC = calc_crc8(temp_array_CRC, *lastCRC_send);
 
 	/*save new CRC value in old variable*/
 	(*lastCRC_send) = newCRC;
