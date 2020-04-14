@@ -15,7 +15,12 @@
 /*************************************************************************************/
 
 /*
+ * Method to initialize the UART Device
  *
+ * @param:	DeviceID	Identification number of the UART Device which is going to be initialized
+ *
+ * @return:	XST_SUCCESS	If the device was initialized properly
+ * @return:	XST_FAILURE	If the device was not initialized properly
  */
 int Initialize_UART_Device(u16 DeviceID) {
 	XStatus Status;
@@ -49,7 +54,9 @@ int Initialize_UART_Device(u16 DeviceID) {
 }
 
 /*
+ * Method to send the filled Sending Buffer
  *
+ * @param:	SendBuffer	Buffer with the data which is going to be send
  */
 int UART_Send_Buffer(u8 SendBuffer[BUFFER_SIZE]) {
 
@@ -74,7 +81,9 @@ int UART_Send_Buffer(u8 SendBuffer[BUFFER_SIZE]) {
 }
 
 /*
+ * Mehtod to receive the data and store it in the Receive Buffer
  *
+ * @return: staus	Failure or succes
  */
 int UART_Recv_Buffer() {
 	if (Uart_Ps.IsReady != XIL_COMPONENT_IS_READY) {
@@ -106,18 +115,22 @@ int UART_Recv_Buffer() {
 }
 
 /*
+ * Method to send the data
  *
+ * @param:	*data	Pointer to the data which are going to be send
+ *
+ * @return: status	Failure or success of the transmission
  */
-int UART_Send(u8 *data, int packageCount)
+int UART_Send(uint8_t *data)
 {
-	for(int packageNumb = 0; packageNumb < packageCount; packageNumb++) //unnecessary
+	XStatus status;
+	for(int byteNumb = 0; byteNumb < 31; byteNumb++)
 	{
-		for(int byteNumb = 0; byteNumb < 31; byteNumb++)
-		{
-			SendBuffer[byteNumb] = *data[packageNumb*BUFFER_SIZE + byteNumb];
+		SendBuffer[byteNumb] = *data[packageNumb*BUFFER_SIZE + byteNumb];
 
-			UART_Send_Buffer(SendBuffer);
-		}
+		status = UART_Send_Buffer(SendBuffer);
 	}
+
+	return status;
 }
 

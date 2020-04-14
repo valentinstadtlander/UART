@@ -66,6 +66,7 @@ void request_to_send(uint8_t ID, uint8_t *temp, uint8_t *lastCRC);
 int package_count(int dataLength);
 void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes[], uint8_t *temp, int packageCount, uint8_t *last_CRC);
 void fill_header(uint8_t *header, uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *flags, uint8_t *lastCRC);
+int wait_on_answer(uint8_t *send_array, uint8_t id, uint8_t *lastCRC_send);
 int UART_ACK();
 
 /******************** Functions to receive ********************/

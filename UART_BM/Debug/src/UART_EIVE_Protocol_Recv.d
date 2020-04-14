@@ -14,7 +14,8 @@ src/UART_EIVE_Protocol_Recv.o src/UART_EIVE_Protocol_Recv.o: \
  ../../fsbl_bsp/psu_cortexa53_0/include/xpseudo_asm.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xreg_cortexa53.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xpseudo_asm_gcc.h \
- ../../fsbl_bsp/psu_cortexa53_0/include/xplatform_info.h ../src/UART_io.h \
+ ../../fsbl_bsp/psu_cortexa53_0/include/xplatform_info.h \
+ ../src/UART_EIVE_Protocol_Flags.h ../src/UART_io.h \
  ../../fsbl_bsp/psu_cortexa53_0/include/xil_printf.h ../src/CRC.h
 
 ../src/UART_EIVE_Protocol.h:
@@ -48,6 +49,8 @@ src/UART_EIVE_Protocol_Recv.o src/UART_EIVE_Protocol_Recv.o: \
 ../../fsbl_bsp/psu_cortexa53_0/include/xpseudo_asm_gcc.h:
 
 ../../fsbl_bsp/psu_cortexa53_0/include/xplatform_info.h:
+
+../src/UART_EIVE_Protocol_Flags.h:
 
 ../src/UART_io.h:
 
