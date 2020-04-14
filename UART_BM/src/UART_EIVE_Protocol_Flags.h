@@ -195,7 +195,7 @@ void set_End_Flag(uint8_t *flags, uint8_t end);
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_ACK_flag(uint8_t *flags);
+int get_ACK_flag(uint8_t flags);
 
 /*
  * Getter Method for REQUEST_TO_SEND-Flag
@@ -204,7 +204,7 @@ int get_ACK_flag(uint8_t *flags);
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_Req_to_send_flag(uint8_t *flags);
+int get_Req_to_send_flag(uint8_t flags);
 
 /*
  * Getter Method for READY_TO_RECEIVE-Flag
@@ -213,7 +213,7 @@ int get_Req_to_send_flag(uint8_t *flags);
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_ready_to_recv_flag(uint8_t *flags);
+int get_ready_to_recv_flag(uint8_t flags);
 
 
 /*
@@ -223,7 +223,7 @@ int get_ready_to_recv_flag(uint8_t *flags);
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_start_flag(uint8_t *flags);
+int get_start_flag(uint8_t flags);
 
 /*
  * Getter Method for END-Flag
@@ -232,5 +232,7 @@ int get_start_flag(uint8_t *flags);
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_end_flag(uint8_t *flags);
+int get_end_flag(uint8_t flags);
+
+
 #endif /* SRC_UART_EIVE_PROTOCOL_FLAGS_H_ */

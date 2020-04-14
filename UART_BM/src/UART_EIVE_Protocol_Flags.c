@@ -87,9 +87,9 @@ void set_End_Flag(uint8_t *flags, uint8_t end)
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_ACK_flag(uint8_t *flags)
+int get_ACK_flag(uint8_t flags)
 {
-	if((*flags & ACK_MASK) != 0)
+	if((flags & ACK_MASK) != 0)
 		return SET;
 	else return NOT_SET;
 }
@@ -101,9 +101,9 @@ int get_ACK_flag(uint8_t *flags)
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_Req_to_send_flag(uint8_t *flags)
+int get_Req_to_send_flag(uint8_t flags)
 {
-	if((*flags & REQ_TO_SEND_MASK) != 0)
+	if((flags & REQ_TO_SEND_MASK) != 0)
 		return SET;
 	else return NOT_SET;
 }
@@ -115,9 +115,9 @@ int get_Req_to_send_flag(uint8_t *flags)
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_ready_to_recv_flag(uint8_t *flags)
+int get_ready_to_recv_flag(uint8_t flags)
 {
-	if((*flags & READY_TO_RECV_MASK) != 0)
+	if((flags & READY_TO_RECV_MASK) != 0)
 		return SET;
 	else return NOT_SET;
 }
@@ -129,9 +129,9 @@ int get_ready_to_recv_flag(uint8_t *flags)
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_start_flag(uint8_t *flags)
+int get_start_flag(uint8_t flags)
 {
-	if((*flags & START_MASK) != 0)
+	if((flags & START_MASK) != 0)
 		return SET;
 	else return NOT_SET;
 }
@@ -143,9 +143,9 @@ int get_start_flag(uint8_t *flags)
  *
  * @return: SET (1) if the bit is set else NOT_SET (0)
  */
-int get_end_flag(uint8_t *flags)
+int get_end_flag(uint8_t flags)
 {
-	if((*flags & END_MASK) != 0)
+	if((flags & END_MASK) != 0)
 		return SET;
 	else return NOT_SET;
 }

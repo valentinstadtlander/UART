@@ -46,7 +46,7 @@ uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte)
  *
  * returns the calculated 8-bit crc value for the whole message
  */
-uint8_t calc_crc8_for_data(uint8_t bytes[], int length, uint8_t crc_initval)
+uint8_t calc_crc8_for_data(uint8_t *bytes, int length, uint8_t crc_initval)
 {
 	uint8_t crc_val = crc_initval;
 	for(int i = 0; i < length; i++)

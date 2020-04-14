@@ -13,7 +13,9 @@
 /*
  * Receive data if its available.
  *
- * @return:
+ * @return: XST_SUCCESS if the receiving was correct.
+ * 			XST_FAILURE if an error occurs.
+ * 			XST_NO_DATA if no data was received.
  *
  */
 int UART_Recv_Data()
@@ -33,7 +35,10 @@ int UART_Recv_Data()
 			return XST_FAILURE;
 	}
 
-	receive();
+	status = receive();
+
+	if(status != XST_SUCCESS)
+		return XST_FAILURE;
 
 	return XST_SUCCESS;
 }
@@ -45,7 +50,8 @@ int UART_Recv_Data()
  * can be received. Then the actual data transmission takes place, where each received packet
  * is acknowledged positively or negatively.
  *
- * @return
+ * @return: XST_SUCCESS if the receiving was correct.
+ * 			XST_FAILURE if an error occurs.
  */
 int receive()
 {
@@ -68,17 +74,23 @@ int receive()
 		return XST_FAILURE;
 
 	//receive the tm/tc
-	status = receive_data(&last_crc_rcv, &last_crc_send, &conn_id, &new_flags);
+	status = receive_data(&last_crc_rcv, &last_crc_send, conn_id, new_flags);
 
 	if(status == XST_FAILURE)
 		return XST_FAILURE;
+
+	return XST_SUCCESS;
 }
 
 /*
+ * To connect with the sender, this method is used. This method checks the
+ * received data for the send request flag and answers with the ready to receive flag.
  *
+ * @param: *last_crc_send: 	The pointer to the last sent crc value.
+ * 		   *new_flags:		The pointer to the flag value which will be send.
  *
- *
- *
+ * @return: XST_SUCCESS if the receiving was correct.
+ * 			XST_FAILURE if an error occurs.
  */
 int connection_establishment(uint8_t *last_crc_send, uint8_t *new_flags, uint8_t *conn_id)
 {
@@ -95,10 +107,10 @@ int connection_establishment(uint8_t *last_crc_send, uint8_t *new_flags, uint8_t
 	*conn_id = header[ID_POS];
 
 	/* crc_check */
-	if(check_crc(header[CRC_POS], header, data, INIT_CRC) != XST_SUCCESS)
+	if(check_crc(header[CRC_POS], RecvBuffer, INIT_CRC) != XST_SUCCESS)
 	{
 		//Send answer without set ACK flag
-		send_failure(last_crc_send, &header[ID_POS]);
+		send_failure(last_crc_send, header[ID_POS]);
 
 		return XST_FAILURE;
 	}
@@ -107,10 +119,10 @@ int connection_establishment(uint8_t *last_crc_send, uint8_t *new_flags, uint8_t
 	set_ACK_Flag(new_flags, ACK);
 
 	/* check request 2 send */
-	if(get_Req_to_send_flag(&header[FLAGS_POS]) == 0)
+	if(get_Req_to_send_flag(header[FLAGS_POS]) == 0)
 	{
 		//Send answer without set ACK flag
-		send_failure(last_crc_send, &header[ID_POS]);
+		send_failure(last_crc_send, header[ID_POS]);
 
 		return XST_FAILURE;
 	}
@@ -120,21 +132,26 @@ int connection_establishment(uint8_t *last_crc_send, uint8_t *new_flags, uint8_t
 
 	int status;
 
-	status = send_success(last_crc_send, conn_id, new_flags);
+	status = send_success(last_crc_send, *conn_id, *new_flags);
 
 	return status;
 }
 
 /*
+ * With this method data will be received from the connected sender.
  *
+ * @param: *crc_rcv: The pointer to the last received crc value.
+ * 		   *crc_send: The pointer to the last sent crc value.
+ * 		   rcvd_id: the message-id in the header
+ * 		   last_sent_flags: the last sent flags
  */
-int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t old_id, uint8_t *flags) //header datei ändern
+int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t rcvd_id, uint8_t last_sent_flags)
 {
 	/* Variable for next received header */
 	uint8_t next_header[4];
 
 	/* Variable for flags */
-	uint8_t flags_to_send = *flags;
+	uint8_t flags_to_send = last_sent_flags;
 
 	/* Variable for next received data */
 	uint8_t new_data[PACKAGE_DATA_SIZE];
@@ -178,10 +195,10 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t old_id, uint8_t *f
 			{
 				if(success == 1)
 					// success == 1 -> send success
-					send_success(&last_crc_send, &old_id, &flags_to_send);
+					send_success(&last_crc_send, rcvd_id, flags_to_send);
 				else
 					//success == 0 -> send failure
-					send_failure(&last_crc_send, &next_header[ID_POS]);
+					send_failure(&last_crc_send, next_header[ID_POS]);
 			}
 
 			//increase timer
@@ -202,7 +219,7 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t old_id, uint8_t *f
 		extract_header(RecvBuffer, next_header, new_data);
 
 		//CRC check
-		if(check_crc(next_header[CRC_POS], next_header, new_data, last_crc_rcv) != XST_SUCCESS)
+		if(check_crc(next_header[CRC_POS], RecvBuffer, last_crc_rcv) != XST_SUCCESS)
 		{
 			//failure
 			success = 0;
@@ -223,10 +240,9 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t old_id, uint8_t *f
 		 * ack = 1: -> continue
 		 *
 		 */
-		if(get_ACK_flag(&next_header[FLAGS_POS]) != ACK)
+		if(get_ACK_flag(next_header[FLAGS_POS]) != ACK)
 		{
 			//failure
-			success = 0;
 			timer = 0;
 			status = XST_NO_DATA;
 			//send_failure(&last_crc_send, &old_id);
@@ -237,7 +253,7 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t old_id, uint8_t *f
 		last_crc_rcv = next_header[CRC_POS];
 
 		//check if this package was the last data package
-		if(get_end_flag(&next_header[FLAGS_POS]) == 1)
+		if(get_end_flag(next_header[FLAGS_POS]) == 1)
 			end = 1;
 
 		//data buffer
@@ -253,15 +269,19 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t old_id, uint8_t *f
 
 		success = 1;
 
-	}// end while
+	}
+	// end while
 
 	//check type
 	uint8_t id = next_header[ID_POS] & TM_MASK;
 
+	//data array with exact length
 	uint8_t data[datacounter];
 
+	//fill data array
 	for(int byte = 0; byte < datacounter; byte++)
 		data[byte] = databuffer[byte];
+
 	//
 	switch(id)
 	{
@@ -279,9 +299,14 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t old_id, uint8_t *f
 }
 
 /*
+ * This method splits the received data into header and payload data.
+ *
+ * @param: *rcvBuffer: 	The pointer to the Buffer with the received data.
+ * 		   *header: 	The pointer to the header array to store the extracted header.
+ * 		   *data:		The pointer to the data array to store the extracted payload data.
  *
  */
-int extract_header(uint8_t *rcvBuffer, uint8_t *header, uint8_t *data)
+int extract_header(const uint8_t *rcvBuffer, uint8_t *header, uint8_t *data)
 {
 	for(int header_pos = 0; header_pos < HEADER_SIZE; header_pos++)
 		header[header_pos] = rcvBuffer[header_pos];
@@ -300,7 +325,7 @@ int extract_header(uint8_t *rcvBuffer, uint8_t *header, uint8_t *data)
  *
  * @return: The success or failure of sending the answer
  */
-int send_failure(uint8_t *last_crc, uint8_t *old_id)
+int send_failure(uint8_t *last_crc, uint8_t old_id)
 {
 	//all flags are set to zero
 	uint8_t failure_flags = UNSET_ALL_FLAGS;
@@ -315,7 +340,7 @@ int send_failure(uint8_t *last_crc, uint8_t *old_id)
 	set_ACK_Flag(&failure_flags, NACK);
 
 	//fill the header for the package to send
-	fill_header(header, *old_id, empty_data, EMPTY_DATA_LENGTH, &failure_flags, last_crc);
+	fill_header(header, old_id, empty_data, EMPTY_DATA_LENGTH, &failure_flags, last_crc);
 
 	//send answer package
 	int status = UART_answer(header);
@@ -323,25 +348,22 @@ int send_failure(uint8_t *last_crc, uint8_t *old_id)
 	return status;
 }
 
-/**
+/*
  * Sends an answer with set ACK flag and the wanted flags
  *
  * @param: *last_crc: the address of the last sent CRC-value
- * 		   *old_id:	  the address of the id of the received package
- * 		   *flags: 	  the address of the flags to send
+ * 		   id:	  	  the id of the received package
+ * 		   flags: 	  the flags to send
  *
  * @return: The success or failure of sending the answer
  */
-int send_success(uint8_t *last_crc, uint8_t *old_id, uint8_t *flags)
+int send_success(uint8_t *last_crc, uint8_t id, uint8_t flags)
 {
 	//header array
 	uint8_t header[HEADER_SIZE];
 
-	//empty data array
-	uint8_t empty_data[PACKAGE_DATA_SIZE] = {0};
-
 	//fill the header for the package to send
-	fill_header(header, *old_id, empty_data, EMPTY_DATA_LENGTH, flags, last_crc);
+	fill_header(header, id, flags, last_crc);
 
 	//send answer package
 	int status = UART_answer(header);
@@ -366,8 +388,15 @@ int UART_answer(uint8_t *header)
 	return XST_SUCCESS;
 }
 
-/**
+/*
  * !!! Überarbeiten !!!
+ * Data callback for received TC. Every subsystem gets his own command.
+ *
+ * @param: *header: pointer to the header array
+ * 		   *databytes: pointer to the data array
+ *
+ * @return: Success or failure of the data callback
+ *
  */
 int recv_TC(uint8_t *header, u8 *databytes)
 {
@@ -389,12 +418,18 @@ int recv_TC(uint8_t *header, u8 *databytes)
 
 /*
  * !!! Noch zu deklarieren !!!
+ * This method is used to store the received TM.
+ *
  */
 int recv_TM()
 {
 
+	return XST_SUCCESS;
 }
 
+/*
+ *
+ */
 void default_operation()
 {
 
