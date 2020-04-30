@@ -16,7 +16,7 @@
 /*************************************************************************************/
 
 
-
+int maiin(void);
 
 int UART_Send_Hello_World(XUartPs *UartDevice);
 int UART_Recv_Hello_World(XUartPs *UartDevice);
@@ -24,7 +24,7 @@ int UART_Recv_Hello_World(XUartPs *UartDevice);
 /**
  * Main Method for UART
  */
-int main(void)
+int maiin(void)
 {
 	Initialize_UART_Device(UART0_DEVICE_ID);
 	while(1)

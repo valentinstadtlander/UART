@@ -38,6 +38,6 @@ int Initialize_UART_Device(u16 DeviceID);
 int UART_Send_Buffer(u8 SendBuffer[BUFFER_SIZE]);
 int UART_Recv_Buffer();
 
-int UART_Send(u8 *data, int dataLength);
+int UART_Send(u8 *data);
 
 #endif /* SRC_UART_IO_H_ */

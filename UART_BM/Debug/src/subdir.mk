@@ -8,6 +8,7 @@ LD_SRCS += \
 
 C_SRCS += \
 ../src/CRC.c \
+../src/Client.c \
 ../src/Hello_world.c \
 ../src/UART_EIVE_Protocol_Flags.c \
 ../src/UART_EIVE_Protocol_Recv.c \
@@ -16,6 +17,7 @@ C_SRCS += \
 
 OBJS += \
 ./src/CRC.o \
+./src/Client.o \
 ./src/Hello_world.o \
 ./src/UART_EIVE_Protocol_Flags.o \
 ./src/UART_EIVE_Protocol_Recv.o \
@@ -24,6 +26,7 @@ OBJS += \
 
 C_DEPS += \
 ./src/CRC.d \
+./src/Client.d \
 ./src/Hello_world.d \
 ./src/UART_EIVE_Protocol_Flags.d \
 ./src/UART_EIVE_Protocol_Recv.d \
