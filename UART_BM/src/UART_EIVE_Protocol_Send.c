@@ -6,10 +6,10 @@
  */
 
 #include "UART_EIVE_Protocol.h"
-//#include "UART_io.h"
+#include "UART_io.h"
 #include "CRC.h"
-//#include "UART_io.h"
-//#include "xparameters.h"
+#include "UART_io.h"
+#include "xparameters.h"
 #include "UART_EIVE_Protocol_Flags.h"
 
 
