@@ -14,8 +14,8 @@
 #include "stdio.h"
 #include <stddef.h>
 #include <stdint.h>
-//#include "xparameters.h"
-//#include "xuartps.h"
+#include "xparameters.h"
+#include "xuartps.h"
 #include "UART_EIVE_Protocol_Flags.h"
 
 

@@ -6,6 +6,7 @@
  *      Author: Valentin & Tobias
  */
 
+#include "UART_EIVE_Protocol_Flags.h"
 #include "UART_EIVE_Protocol.h"
 #include "UART_io.h"
 #include "CRC.h"

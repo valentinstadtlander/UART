@@ -8,6 +8,8 @@
 #ifndef SRC_UART_EIVE_PROTOCOL_FLAGS_H_
 #define SRC_UART_EIVE_PROTOCOL_FLAGS_H_
 
+#include <stdint.h>
+
 /******************** SET and NOT_SET ********************/
 
 /*
