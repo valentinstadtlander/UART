@@ -241,14 +241,14 @@ int send_request_to_send(uint8_t ID, uint8_t *temp32, uint8_t *lastCRC_send, uin
 	while(status != XST_SUCCESS)
 	{
 		// -> Network now
-		//status = UART_Send(temp32, 1);
+		status = UART_Send(temp32);
 		printf("SEND DATA!!!!!\n");
-		status = XST_SUCCESS;
+		/*status = XST_SUCCESS;
 		if(send(sock, temp32, BUFFER_SIZE, 0) != BUFFER_SIZE)
 		{
 			status = XST_FAILURE;
 			puts("ERROR sendreq2send");
-		}
+		}*/
 
 		puts("while");
 		if(try == 50)
@@ -350,9 +350,9 @@ int send_data(uint8_t ID, uint8_t *databytes, int dataLength, uint8_t *lastCRC_s
 
 		printf("after crc in while\n");
 		//Send package -> Network now
-		//status = UART_Send(send_array, 1);
-		if(send(sock, send_array, BUFFER_SIZE, 0) != BUFFER_SIZE)
-			puts("EEROR");
+		status = UART_Send(send_array);
+		/*if(send(sock, send_array, BUFFER_SIZE, 0) != BUFFER_SIZE)
+			puts("EEROR");*/
 
 		printf("after send in while\n");
 		if(status != XST_SUCCESS)
@@ -449,12 +449,12 @@ int wait_on_answer(uint8_t *send_array, uint8_t ID, uint8_t *lastCRC_send)
 	{
 		printf("Wait for answer: while\n");
 		// -> Network now
-		//status = UART_Recv_Buffer();
-		if(recv(sock, RecvBuffer, BUFFER_SIZE, 0) < 0)
-			puts("ERROR waitOnAnswer1");
+		status = UART_Recv_Buffer();
+		/*if(recv(sock, RecvBuffer, BUFFER_SIZE, 0) < 0)
+			puts("ERROR waitOnAnswer1");*/
 
 
-		status = XST_SUCCESS; //test
+		//status = XST_SUCCESS; //test
 
 		printf("Answer received!!: \n");
 		if(status != XST_NO_DATA && status != XST_SUCCESS)
@@ -471,16 +471,16 @@ int wait_on_answer(uint8_t *send_array, uint8_t ID, uint8_t *lastCRC_send)
 				printf("Timer is max timer\n");
 				uint8_t temp[BUFFER_SIZE] = {nack_header[ID_POS], nack_header[CRC_POS], nack_header[DATA_SIZE_POS], nack_header[FLAGS_POS]};
 				// -> Network now
-				//UART_Send(temp, 1);
-				if(send(sock, temp, BUFFER_SIZE, 0) != BUFFER_SIZE)
-					puts("ERROR waitOnAnswer2");
+				UART_Send(temp);
+				/*if(send(sock, temp, BUFFER_SIZE, 0) != BUFFER_SIZE)
+					puts("ERROR waitOnAnswer2");*/
 			}
 			else
 			{
 				// -> Network now
-				//UART_Send(send_array, 1);
-				if(send(sock, send_array, BUFFER_SIZE, 0) != BUFFER_SIZE)
-					puts("ERROR waitOnAnswer3");
+				UART_Send(send_array);
+				/*if(send(sock, send_array, BUFFER_SIZE, 0) != BUFFER_SIZE)
+					puts("ERROR waitOnAnswer3");*/
 			}
 
 			//reset timer
