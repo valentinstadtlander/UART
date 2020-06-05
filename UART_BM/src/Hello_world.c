@@ -69,8 +69,18 @@ int UART_Send_Hello_World(XUartPs *UartDevice)
  */
 int UART_Recv_Hello_World(XUartPs *UartDevice)
 {
-	UART_Recv_Buffer();
-	UART_Send_Buffer(RecvBuffer);
-	return XST_SUCCESS;
+	int status = 0;
+	do
+	{
+		 status = UART_Recv_Buffer();
+	}while(status == XST_NO_DATA);
+
+	if(status != XST_SUCCESS)
+	{
+		UART_Send_Buffer(RecvBuffer);
+		return XST_SUCCESS;
+	}
+	else
+		return XST_FAILURE;
 }
 

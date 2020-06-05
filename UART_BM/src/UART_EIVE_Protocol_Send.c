@@ -523,7 +523,11 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp
 		{
 			printf("fill header first pkg\n");
 			//Fill header[DATA_SIZE_POS]
-			header[DATA_SIZE_POS] = PACKAGE_DATA_SIZE;
+			//header[DATA_SIZE_POS] = PACKAGE_DATA_SIZE;
+			if(dataLength > PACKAGE_DATA_SIZE - 1)
+				header[DATA_SIZE_POS] = PACKAGE_DATA_SIZE;
+			else
+				header[DATA_SIZE_POS] = dataLength;
 
 			printf("Set start flag\n");
 			/*
