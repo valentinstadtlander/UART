@@ -12,15 +12,27 @@
 
 /************************************Include Files************************************/
 #include "stdio.h"
-#include "xparameters.h"
-#include "xuartps.h"
+#include <stddef.h>
+#include <stdint.h>
+//#include "xparameters.h"
+//#include "xuartps.h"
 #include "UART_EIVE_Protocol_Flags.h"
+
 
 /*************************************************************************************/
 
+#define XST_SUCCESS 0
+#define XST_NO_DATA 13
+#define XST_FAILURE -1
+
 /** Size of package data and header **/
+#define BUFFER_SIZE 		32
 #define PACKAGE_DATA_SIZE 	28
 #define HEADER_SIZE 		4
+
+int sock;
+
+uint8_t RecvBuffer[BUFFER_SIZE];
 
 #define EMPTY_DATA_LENGTH 	0
 
@@ -89,17 +101,7 @@ int UART_Send_Data(uint8_t ID, uint8_t *databytes, int dataLength);
  * @return:	XST_SUCCES	If the connection was established properly
  * @return:	XST_FAILURE	If the connection was not established properly
  */
-int connect(uint8_t ID, uint8_t *databytes, uint8_t dataLength, uint8_t *lastCRC_send, uint8_t *lastCRC_rcvd);
-
-/*
- *Request to send, to establish a connection
- *
- *@param:	ID			Identification number of the package to send
- *@param:	*lastCRC	Pointer, last CRC value to save the new CRC value for the next package
- *
- *Configures a package to send a request to send and saves the first CRC
- */
-int send_request_to_send(uint8_t ID, uint8_t *temp32, uint8_t *lastCRC_send, uint8_t *flags);
+int connect_(uint8_t ID, uint8_t *databytes, uint8_t dataLength, uint8_t *lastCRC_send, uint8_t *lastCRC_rcvd);
 
 /*
  *Request to send, to establish a connection
@@ -183,7 +185,7 @@ void fill_packages(uint8_t ID, int dataLength, uint8_t *databytes, uint8_t *temp
  *
  * This method fills the header of empty packages which are going to be send
  */
-void fill_header_for_empty_data(uint8_t *header, uint8_t ID, uint8_t flags, uint8_t *lastCRC_send);
+uint8_t fill_header_for_empty_data(uint8_t *header, uint8_t ID, uint8_t flags, uint8_t *lastCRC_send);
 
 /******************** Functions to receive ********************/
 
@@ -219,7 +221,7 @@ int receive();
  * @return: XST_SUCCESS if the receiving was correct.
  * 			XST_FAILURE if an error occurs.
  */
-int connection_establishment(uint8_t *last_crc_send, uint8_t *new_flags, uint8_t *conn_id);
+int connection_establishment(uint8_t *last_crc_rcv, uint8_t *last_crc_send, uint8_t *new_flags, uint8_t *conn_id, uint8_t *calc_crc);
 
 /*
  * With this method data will be received from the connected sender.
@@ -229,7 +231,7 @@ int connection_establishment(uint8_t *last_crc_send, uint8_t *new_flags, uint8_t
  * 		   rcvd_id: the message-id in the header
  * 		   last_sent_flags: the last sent flags
  */
-int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t rcvd_id, uint8_t last_sent_flags);
+int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t rcvd_id, uint8_t last_sent_flags, uint8_t *calc_crc);
 
 /*
  * This method splits the received data into header and payload data.
@@ -242,14 +244,25 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t rcvd_id, uint8_t l
 int extract_header(const uint8_t *rcvBuffer, uint8_t *header, uint8_t *data);
 
 /*
+ * Checks if the id of the incoming packet is known or unknown
+ *
+ * @param: ID: 	The ID of the incoming packet
+ *
+ * @return:		1 -> if it's known
+ * 				0 -> if it's unknown
+ */
+int check_ID(uint8_t ID);
+
+/*
  * Sends an answer without set the ACK flag
  *
- * @param: *last_crc: the address of the last sent CRC-value
- * 		   *old_id:	  the address of the id of the received package
+ * @param: *last_crc: 	the address of the last sent CRC-value
+ * 		   *old_id:	  	the address of the id of the received package
+ * 		   id_unknown:	Set (1) if the error was caused by an unknown ID, else not set (0)
  *
  * @return: The success or failure of sending the answer
  */
-int send_failure(uint8_t *last_crc, uint8_t old_id);
+int send_failure(uint8_t *last_crc, uint8_t old_id, uint8_t *calc_crc, int id_unknown);
 
 /*
  * Sends an answer with set ACK flag and the wanted flags
@@ -260,7 +273,7 @@ int send_failure(uint8_t *last_crc, uint8_t old_id);
  *
  * @return: The success or failure of sending the answer
  */
-int send_success(uint8_t *last_crc, uint8_t id, uint8_t flags);
+int send_success(uint8_t *last_crc, uint8_t id, uint8_t flags, uint8_t *calc_crc);
 
 /*
  * Sends the answer package with empty data
@@ -280,7 +293,7 @@ int UART_answer(uint8_t *header);
  * @return: Success or failure of the data callback
  *
  */
-int recv_TC(uint8_t *header, u8 *databytes);
+int recv_TC(uint8_t *header, uint8_t *databytes, int size_of_data);
 
 /*
  * This method is used to store the received TM.
