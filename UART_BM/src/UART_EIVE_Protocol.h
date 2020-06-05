@@ -21,9 +21,9 @@
 
 /*************************************************************************************/
 
-#define XST_SUCCESS 0
-#define XST_NO_DATA 13
-#define XST_FAILURE -1
+//#define XST_SUCCESS 0
+//#define XST_NO_DATA 13
+//#define XST_FAILURE -1
 
 /** Size of package data and header **/
 #define BUFFER_SIZE 		32
@@ -32,7 +32,7 @@
 
 int sock;
 
-uint8_t RecvBuffer[BUFFER_SIZE];
+//uint8_t RecvBuffer[BUFFER_SIZE];
 
 #define EMPTY_DATA_LENGTH 	0
 

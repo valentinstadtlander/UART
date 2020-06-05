@@ -7,7 +7,7 @@
  */
 
 #include "UART_EIVE_Protocol.h"
-//#include "UART_io.h"
+#include "UART_io.h"
 #include "CRC.h"
 #include "string.h"
 #include "stdio.h"
@@ -26,13 +26,13 @@ int UART_Recv_Data()
 	int status = XST_SUCCESS;
 
 	//Check the receive buffer if data is available ->Network now
-	//status = UART_Recv_Buffer();
-	if((status = recv(sock, RecvBuffer, BUFFER_SIZE, 0)) < 0)
-		puts("ERROR UARTRecvData");
+	status = UART_Recv_Buffer();
+	//if((status = recv(sock, RecvBuffer, BUFFER_SIZE, 0)) < 0)
+		//puts("ERROR UARTRecvData");
 
 	//if data available continue, else return
-	//if(status != XST_SUCCESS)
-	if(status < 0)
+	if(status != XST_SUCCESS)
+	//if(status < 0)
 	{
 		if(status == XST_NO_DATA)
 			return XST_NO_DATA;
@@ -259,12 +259,12 @@ int receive_data(uint8_t *crc_rcv, uint8_t *crc_send, uint8_t rcvd_id, uint8_t l
 			timer++;
 
 			//receive data if available -> Network now
-			//status = UART_Recv_Buffer();
-			if(recv(sock, RecvBuffer, BUFFER_SIZE, 0) < 0)
-				puts("ERROR RecvAnswer");
+			status = UART_Recv_Buffer();
+			//if(recv(sock, RecvBuffer, BUFFER_SIZE, 0) < 0)
+				//puts("ERROR RecvAnswer");
 
 
-			status = XST_SUCCESS; //Test
+			//status = XST_SUCCESS; //Test
 
 			printf("Received!");
 			//check status of receiving
@@ -503,10 +503,10 @@ int UART_answer(uint8_t *header)
 	uint8_t temp[BUFFER_SIZE] = {header[ID_POS], header[CRC_POS], header[DATA_SIZE_POS], header[FLAGS_POS]};
 
 	//-> Network now
-	//UART_Send(temp, 1);
+	UART_Send(temp);
 	printf("send answer\n");
-	if(send(sock, temp, BUFFER_SIZE, 0) != BUFFER_SIZE)
-		puts("ERROR UARTAnswer");
+	//if(send(sock, temp, BUFFER_SIZE, 0) != BUFFER_SIZE)
+		//puts("ERROR UARTAnswer");
 
 	printf("success sending answer\n");
 	return XST_SUCCESS;

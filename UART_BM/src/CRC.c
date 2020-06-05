@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "CRC.h"
-//#include "UART_io.h"
-//#include "xparameters.h"
+#include "UART_io.h"
+#include "xparameters.h"
 #include "UART_EIVE_Protocol.h"
 
 /*

@@ -126,7 +126,7 @@ int UART_Send(uint8_t *data)
 	XStatus status;
 	for(int byteNumb = 0; byteNumb < 31; byteNumb++)
 	{
-		SendBuffer[byteNumb] = *data[BUFFER_SIZE + byteNumb];
+		SendBuffer[byteNumb] = data[BUFFER_SIZE + byteNumb];
 
 		status = UART_Send_Buffer(SendBuffer);
 	}
