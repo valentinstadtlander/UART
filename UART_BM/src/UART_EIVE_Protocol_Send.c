@@ -445,7 +445,7 @@ int wait_on_answer(uint8_t *send_array, uint8_t ID, uint8_t *lastCRC_send)
 	int status = XST_NO_DATA;
 	int timer;
 
-	while(status != XST_SUCCESS)
+	while(status != XST_SUCCESS) //MAX_TIMER counter
 	{
 		printf("Wait for answer: while\n");
 		// -> Network now

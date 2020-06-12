@@ -34,7 +34,7 @@ uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte)
 		}
 	}
 
-	return crc;
+	return (crc ^FINAL_XOR);
 }
 
 /*

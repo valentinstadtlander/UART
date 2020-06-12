@@ -24,6 +24,14 @@
 #define INIT_CRC 0x00
 
 /*
+*
+*Final XOR value for calculating CRC after every single byte
+*
+*
+*/
+#define FINAL_XOR 0x00
+
+/*
  * CRC calculation function for a message more than one byte
  *
  * bytes[]:     message with bytes for crc calculation

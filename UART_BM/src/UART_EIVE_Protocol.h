@@ -80,10 +80,10 @@ uint8_t databuffer[357143];
  * @param:	*databytes	Pointer to the data which is going to be send
  * @param:	dataLength	Length of the data which is going to be send
  *
- * @return:	XST_SUCCES	If the data was send properly
- * @return:	XST_FAILURE	If the data was not send properly
+ * @return:	XST_SUCCES	If the data was sent properly
+ * @return:	XST_FAILURE	If the data was not sent properly
  *
- * This method uses the connection_establishment() -Method to establish a connection between the sender and the receiver.
+ * This method uses the connect_t() -Method two establish a connection between the sender and the receiver.
  * It also uses the send_data() -method to send the transfered data to the receiver after a connection was established.
  * It returns an error if the data could not to be send and a success, if the transmission was possible
  */
@@ -201,7 +201,7 @@ int UART_Recv_Data();
 
 /*
  * In this method the protocol for receiving data is implemented, which requires a connection
- * to the sender. A connection is established to receive packets longer than 28 bytes.
+ * to the transmitter. A connection is established to receive packets longer than 28 bytes.
  * First, it is indicated that some data is to be transmitted, to which it responds that data
  * can be received. Then the actual data transmission takes place, where each received packet
  * is acknowledged positively or negatively.
@@ -212,19 +212,19 @@ int UART_Recv_Data();
 int receive();
 
 /*
- * To connect with the sender, this method is used. This method checks the
+ * To connect with the transmitter, this method is used. This method checks the
  * received data for the send request flag and answers with the ready to receive flag.
  *
  * @param: *last_crc_send: 	The pointer to the last sent crc value.
  * 		   *new_flags:		The pointer to the flag value which will be send.
  *
- * @return: XST_SUCCESS if the receiving was correct.
- * 			XST_FAILURE if an error occurs.
+ * @return: XST_SUCCESS if the connection was established correctly
+ * 			XST_FAILURE if the connection was not established correctly
  */
 int connection_establishment(uint8_t *last_crc_rcv, uint8_t *last_crc_send, uint8_t *new_flags, uint8_t *conn_id, uint8_t *calc_crc);
 
 /*
- * With this method data will be received from the connected sender.
+ * With this method data will be received from the connected transmitterr.
  *
  * @param: *crc_rcv: The pointer to the last received crc value.
  * 		   *crc_send: The pointer to the last sent crc value.
