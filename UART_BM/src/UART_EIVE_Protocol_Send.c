@@ -117,13 +117,15 @@ int connect_(uint8_t ID, uint8_t *databytes, uint8_t dataLength, uint8_t *lastCR
 			{
 				printf("Wait on answer a\n");
 				//wait on answer sending again temp32
-				printf("Value: %i\n", wait_on_answer(temp32, ID, lastCRC_send));
+				//printf("Value: %i\n",
+                wait_on_answer(temp32, ID, lastCRC_send);
 			}
 			else
 			{
 				printf("Wait on answer b\n");
 				//wait on answer sending again NACK
-				printf("Value: %i\n", wait_on_answer(NULL, ID, lastCRC_send));
+				//printf("Value: %i\n",
+                wait_on_answer(NULL, ID, lastCRC_send);
 			}
 
 			printf("connect: get_received_data\n");
