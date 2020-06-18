@@ -442,7 +442,10 @@ int send_failure(uint8_t *last_crc, uint8_t old_id, uint8_t *calc_crc, int id_un
 	printf("unset all flags\n");
 
 	if(id_unknown == SET)
-		set_ID_Unknown_Flag(&failure_flags, SET);
+    {
+        set_ID_Unknown_Flag(&failure_flags, SET);
+        set_ACK_Flag(&failure_flags, SET);
+    }
 
 	//header array
 	uint8_t header[HEADER_SIZE];
@@ -504,13 +507,13 @@ int UART_answer(uint8_t *header)
 	uint8_t temp[BUFFER_SIZE] = {header[ID_POS], header[CRC_POS], header[DATA_SIZE_POS], header[FLAGS_POS]};
 
 	//-> Network now
-	UART_Send(temp);
+	int status = UART_Send(temp);
 	printf("send answer\n");
 	//if(send(sock, temp, BUFFER_SIZE, 0) != BUFFER_SIZE)
 		//puts("ERROR UARTAnswer");
 
 	printf("success sending answer\n");
-	return XST_SUCCESS;
+	return status;
 
 }
 

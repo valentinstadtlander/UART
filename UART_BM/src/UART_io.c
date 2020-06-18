@@ -85,7 +85,7 @@ int UART_Send_Buffer(u8 SendBuffer[BUFFER_SIZE]) {
  *
  * @return: staus	Failure or succes
  */
-int UART_Recv_Buffer() {
+int UART_Recv_Buffer(uint8_t* RecvBuffer) {
 	if (Uart_Ps.IsReady != XIL_COMPONENT_IS_READY) {
 		return XST_FAILURE;
 	}
@@ -124,12 +124,9 @@ int UART_Recv_Buffer() {
 int UART_Send(uint8_t *data)
 {
 	XStatus status;
-	for(int byteNumb = 0; byteNumb < 31; byteNumb++)
-	{
-		SendBuffer[byteNumb] = data[BUFFER_SIZE + byteNumb];
-
-		status = UART_Send_Buffer(SendBuffer);
-	}
+	
+    status = UART_Send_Buffer(data);
+	
 
 	return status;
 }
