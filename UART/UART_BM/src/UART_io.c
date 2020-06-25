@@ -1,6 +1,7 @@
 /*
  * UART_io.c
 
+
  *
  *  Created on: 27.03.2020
  *      Author: Valentin & Tobias
@@ -27,6 +28,11 @@ int Initialize_UART_Device(u16 DeviceID) {
 	XUartPs_Config *Config;
 	u16 Index;
 
+	/* Reset RecvBuffer */
+	for (Index = 0; Index < BUFFER_SIZE; Index++) {
+			RecvBuffer[Index] = 0;
+	}
+
 	Config = XUartPs_LookupConfig(DeviceID);
 	if (NULL == Config) {
 		return XST_FAILURE;
@@ -46,9 +52,7 @@ int Initialize_UART_Device(u16 DeviceID) {
 	/* Change operation mode. */
 	XUartPs_SetOperMode(&Uart_Ps, XUARTPS_OPER_MODE_NORMAL);
 
-	for (Index = 0; Index < BUFFER_SIZE; Index++) {
-		RecvBuffer[Index] = 0;
-	}
+	xil_printf("%i", XUartPs_GetFifoThreshold(&Uart_Ps));
 
 	return XST_SUCCESS;
 }
@@ -85,7 +89,7 @@ int UART_Send_Buffer(u8 SendBuffer[BUFFER_SIZE]) {
  *
  * @return: staus	Failure or succes
  */
-int UART_Recv_Buffer(uint8_t* RecvBuffer) {
+int UART_Recv_Buffer(uint8_t *RecvBuffer) {
 	if (Uart_Ps.IsReady != XIL_COMPONENT_IS_READY) {
 		return XST_FAILURE;
 	}
@@ -94,22 +98,15 @@ int UART_Recv_Buffer(uint8_t* RecvBuffer) {
 		RecvBuffer[Index] = 0;
 	}
 
-	/* Wait until there is data */
-	/*while (!XUartPs_IsReceiveData(Uart_Ps.Config.BaseAddress));*/
-
 	/* Break if no data  */
-	 if(!XUartPs_IsReceiveData(Uart_Ps.Config.BaseAddress))
+	if(!XUartPs_IsReceiveData(Uart_Ps.Config.BaseAddress))
 		 return XST_NO_DATA;
-
 
 	/* Block for receiving the buffer. */
 	u32 ReceivedCount = 0;
 	while (ReceivedCount < BUFFER_SIZE) {
 		ReceivedCount += XUartPs_Recv(&Uart_Ps, &RecvBuffer[ReceivedCount],
 				(BUFFER_SIZE - ReceivedCount));
-
-		/*if (RecvBuffer[ReceivedCount - 1] == END_OF_TRANSMISSION)
-			break;*/
 	}
 	return XST_SUCCESS;
 }
@@ -124,9 +121,8 @@ int UART_Recv_Buffer(uint8_t* RecvBuffer) {
 int UART_Send(uint8_t *data)
 {
 	XStatus status;
-	
-    status = UART_Send_Buffer(data);
-	
+
+	status = UART_Send_Buffer(data);
 
 	return status;
 }

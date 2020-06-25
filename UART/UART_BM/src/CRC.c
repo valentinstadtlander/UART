@@ -34,7 +34,7 @@ uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte)
 		}
 	}
 
-	return (crc ^FINAL_XOR);
+	return crc;
 }
 
 /*
@@ -48,20 +48,19 @@ uint8_t calc_crc8_for_one_byte(uint8_t start_crc, uint8_t byte)
  */
 uint8_t calc_crc8_for_data(uint8_t *bytes, int length, uint8_t crc_initval)
 {
-
 	uint8_t crc_val = crc_initval;
 	for(int i = 0; i < length; i++)
 	{
 		crc_val = calc_crc8_for_one_byte(crc_val, bytes[i]);
 	}
-
-	printf("calculated crc: %i\n", crc_val);
 	return crc_val;
 }
 
+/*
+ * CRC value calculation for one byte
+ */
 uint8_t calc_crc8(uint8_t *send_array, uint8_t crc_initval)
 {
-	printf("crc8: initval: %i\n", crc_initval);
 	uint8_t temp31[BUFFER_SIZE - 1] = {0};
 
 	for(int i = 0; i < CRC_POS; i++)
@@ -73,13 +72,11 @@ uint8_t calc_crc8(uint8_t *send_array, uint8_t crc_initval)
 	{
 		temp31[j] = send_array[j + 1];
 	}
-
-	puts("calc crc8");
 	return calc_crc8_for_data(temp31, BUFFER_SIZE - 1, crc_initval);
 }
 
 /*
- *
+ * Method for comparing two submitted CRC values
  */
 int check_crc(uint8_t crc_val, uint8_t *rcv_buffer, uint8_t crc_initval)
 {
@@ -89,9 +86,6 @@ int check_crc(uint8_t crc_val, uint8_t *rcv_buffer, uint8_t crc_initval)
 
 	if(calculated_crc != crc_val)
 		return XST_FAILURE;
-
-
-	//*crc_initval = calculated_crc;
 
 	return XST_SUCCESS;
 }

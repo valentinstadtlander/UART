@@ -253,7 +253,13 @@ int get_start_flag(uint8_t flags);
  */
 int get_end_flag(uint8_t flags);
 
-
+/*
+ * Getter Method for ID_Unknown-Flag
+ *
+ * @param: *flags: The pointer of the flag byte from the header
+ *
+ * @return: SET (1) if the bit is set else NOT_SET (0)
+ */
 int get_ID_Unknown_Flag(uint8_t flags);
 
 

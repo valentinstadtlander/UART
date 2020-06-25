@@ -39,7 +39,6 @@ void set_Req_to_send_Flag(uint8_t *flags, uint8_t req_to_send)
 
 /*
  * Setter Method for Rdy_to_rcv-Flag
-
  *
  * @*flags 		flags array
  * @rdy_to_rcv 	bit req_to_send
