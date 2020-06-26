@@ -13,7 +13,7 @@
  * Setter Method for ACK-Flag
  *
  * @*flags 	flags array
- * @set_flag     Set flag for ACK (if SET = 1) or NACK (if SET = 0)
+ * @set_flag     Set flag for ACK (if set_flag = 1) or NACK (if set_flag = 0)
  */
 void set_ACK_Flag(uint8_t *flags, uint8_t set_flag)
 {
