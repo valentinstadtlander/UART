@@ -161,51 +161,51 @@
  * Setter Method for ACK-Flag
  *
  * @*flags 	flags array
- * @ack 	ACK or NACK
+ * @SET 	Set flag for ACK (if SET = 1) or NACK (if SET = 0)
  */
-void set_ACK_Flag(uint8_t *flags, uint8_t ack);
+void set_ACK_Flag(uint8_t *flags, uint8_t SET);
 
 /*
  * Setter Method for Req_to_send-Flag
  *
  * @*flags 			flags array
- * @req_to_send 	bit req_to_send
+ * @SET 	        set flag for request to send
  */
-void set_Req_to_send_Flag(uint8_t *flags, uint8_t req_to_send);
+void set_Req_to_send_Flag(uint8_t *flags, uint8_t SET);
 
 /*
  * Setter Method for Rdy_to_rcv-Flag
 
  *
  * @*flags 		flags array
- * @rdy_to_rcv 	bit req_to_send
+ * @SET 	    set flag for ready to receive
  */
-void set_Rdy_to_rcv_Flag(uint8_t *flags, uint8_t rdy_to_rcv);
+void set_Rdy_to_rcv_Flag(uint8_t *flags, uint8_t SET);
 
 /*
  * Setter Method for Start-Flag
  *
  * @*flags 	flags array
- * @start 	first package
+ * @SET 	set flag for first package
  */
-void set_Start_Flag(uint8_t *flags, uint8_t start);
+void set_Start_Flag(uint8_t *flags, uint8_t SET);
 
 /*
  * Setter Method for End-Flag
  *
  * @*flags 	flags array
- * @end 	last package
+ * @SET 	set flag for last package
  */
-void set_End_Flag(uint8_t *flags, uint8_t end);
+void set_End_Flag(uint8_t *flags, uint8_t SET);
 
 /*
  * Setter method for the id unknown flag
  *
  * @param: *flags: 	The pointer of the flag byte from the header
- * 		   idu:		Set (1) or Unset (0) the flag bit
+ * 		   SET:		Set (1) or Unset (0) the flag ID Unknown bit
  *
  */
-void set_ID_Unknown_Flag(uint8_t *flags, uint8_t idu);
+void set_ID_Unknown_Flag(uint8_t *flags, uint8_t SET);
 
 /*
  * Getter Method for ACK-Flag
